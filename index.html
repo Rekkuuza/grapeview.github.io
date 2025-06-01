@@ -67,31 +67,47 @@
 
             $("#p_title").html(fileName);
 
+
             // 讀取資料夾中的檔案
-            var reader = new FileReader();
+            const promiseReadFile = (file) =>
+                new Promise((resolve, reject) => {
+                    const fr = new FileReader();
+                    fr.name = file.name.substring(0, file.name.indexOf('.'));
+                    fr.onload = () => resolve(fr);
+                    fr.onerror = (err) => reject(err);
+                    fr.readAsDataURL(file);
+                });
 
-            readFile(0);
 
-            function readFile(index) {
+            async function setImagesData(fileList) {
+                let imgFiles = [];
 
-                if (index >= files.length) return;
+                const frPromises = fileList.map(promiseReadFile);
 
-                var file = files[index];
-
-                reader.onload = function () {
-
-                    var imgSrc = this.result;
-
-                    index += 1;
-                    appendImg(index, imgSrc);
-
-                    readFile(index)
+                try {
+                    imgFiles = await Promise.all(frPromises);
+                } catch (err) {
+                    console.error(err);
+                    return;
                 }
-                reader.readAsDataURL(file);
+
+                // 圖片排序
+                imgFiles.sort((a, b) => {
+                    return parseInt(a.name) - parseInt(b.name);
+                });
+
+                // 加載圖片
+                imgFiles.forEach((fr, index) => {
+
+                    appendImg(index + 1, fr.result);
+
+                });
             }
+
+            setImagesData([...files]);
+
         }
 
-        let fileHandle;
 
         async function unzipReadFiles(files) {
 
@@ -103,33 +119,73 @@
             if (!file) return;
 
             // 顯示檔名
-
             $("#p_title").html(file.name);
 
-            // 讀取壓縮檔
-            const zip = await JSZip.loadAsync(file);
-
-            var index = 1;
-
-            Object.keys(zip.files).forEach(async function (filename) {
-
-                const fileData = zip.files[filename];
-
-                if (!fileData.dir && /\.(jpe?g|png|gif|webp|bmp)$/i.test(filename)) {
 
 
-                    const blob = await fileData.async('blob');
-                    const imgSrc = URL.createObjectURL(blob);
+            const setImageArrayPromise = new Promise(async (resolve) => {
 
-                    appendImg(index, imgSrc);
+                var imgFiles = [];
 
-                    index += 1;
-                }
+                var new_zip = new JSZip();
+
+                // 讀取壓縮檔
+                var zip = await new_zip.loadAsync(file);
+
+                for (const filename of Object.keys(zip.files)) {
+
+                    const fileData = zip.files[filename];
+
+                    if (!fileData.dir && /\.(jpe?g|png|gif|webp|bmp)$/i.test(filename)) {
 
 
+                        const blob = await fileData.async('blob');
+                        const imgSrc = URL.createObjectURL(blob);
+
+
+
+                        var _filename = filename.substring(filename.indexOf('/') + 1, filename.lastIndexOf('.'));
+
+                        var _img = {};
+                        _img.imgSrc = imgSrc;
+                        _img.name = _filename;
+
+                        imgFiles.push(_img);
+                    }
+                };
+                resolve(imgFiles);
+
+            });
+
+            setImageArrayPromise.then((imgFiles) => {
+
+                loadImages(imgFiles);
             });
         }
 
+
+
+
+
+
+
+        function loadImages(imgFiles) {
+
+            // 圖片排序
+            imgFiles.sort((a, b) => {
+                return parseInt(a.name) - parseInt(b.name);
+            });
+
+            // 加載圖片
+
+            imgFiles.forEach((fr, index) => {
+
+                appendImg(index, fr.imgSrc);
+            });
+        }
+
+
+        // 將圖片加入圖片區
         function appendImg(index, imgSrc) {
 
             $('#div_imgs').append('<p>' + index + '</p>');
