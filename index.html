@@ -1,7 +1,142 @@
 <!DOCTYPE html>
 <html>
-<body>
-<h1>Hello World</h1>
-<p>I'm hosted with GitHub Pages.</p>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Grape View</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+
+</head>
+
+<body class="bg-dark">
+
+    <div class="container-xl">
+
+        <h1 class="text-light">Grape View</h1>
+
+        <br />
+        <br />
+        <br />
+
+        <div class="col-3">
+            <label for="select_folder" class="form-label text-light">Select Images folder</label>
+
+            <input class="form-control" id="select_folder" type="file" webkitdirectory multiple
+                onchange="readFiles(this.files)">
+        </div>
+        <br />
+
+        <div class="col-3">
+            <p class=" text-light">Or</p>
+
+            <label for="select_zip" class="form-label text-light">Select zip</label>
+
+            <input class="form-control" id="select_zip" type="file" accept=".zip" onchange="unzipReadFiles(this.files)">
+
+        </div>
+        <br />
+        <br />
+        <div>
+            <p class=" text-light" id="p_title"></p>
+        </div>
+
+
+        <div id="div_imgs"></div>
+
+    </div>
+
+    <script src=" https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <script type="text/javascript">
+
+        function readFiles(files) {
+
+            // 清空圖片區
+            $('#div_imgs').empty();
+
+            // 顯示檔名
+            var _path = files[0].webkitRelativePath;
+
+            var fileName = _path.substring(0, _path.indexOf('/'));
+
+            $("#p_title").html(fileName);
+
+            // 讀取資料夾中的檔案
+            var reader = new FileReader();
+
+            readFile(0);
+
+            function readFile(index) {
+
+                if (index >= files.length) return;
+
+                var file = files[index];
+
+                reader.onload = function () {
+
+                    var imgSrc = this.result;
+
+                    index += 1;
+                    appendImg(index, imgSrc);
+
+                    readFile(index)
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        let fileHandle;
+
+        async function unzipReadFiles(files) {
+
+            // 清空圖片區
+            $('#div_imgs').empty();
+
+            const file = files[0];
+
+            if (!file) return;
+
+            // 顯示檔名
+
+            $("#p_title").html(file.name);
+
+            // 讀取壓縮檔
+            const zip = await JSZip.loadAsync(file);
+
+            var index = 1;
+
+            Object.keys(zip.files).forEach(async function (filename) {
+
+                const fileData = zip.files[filename];
+
+                if (!fileData.dir && /\.(jpe?g|png|gif|webp|bmp)$/i.test(filename)) {
+
+
+                    const blob = await fileData.async('blob');
+                    const imgSrc = URL.createObjectURL(blob);
+
+                    appendImg(index, imgSrc);
+
+                    index += 1;
+                }
+
+
+            });
+        }
+
+        function appendImg(index, imgSrc) {
+
+            $('#div_imgs').append('<p>' + index + '</p>');
+            $('#div_imgs').append('<img src="' + imgSrc + '"/>');
+        }
+
+    </script>
 </body>
+
 </html>
