@@ -8,11 +8,25 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 </head>
 
 <body class="bg-dark">
 
     <div class="container-xl">
+
+
+        <div class="bg-primary rounded-2 position-fixed bottom-0 end-0 m-5">
+
+            <button class="btn btn-primary btn-lg m-2 " onclick="topFunction()" id="btn_top">
+                <span class="bi bi-airplane-fill"></span>
+            </button>
+
+            <select id="page_select" class="form-select form-select-lg mb-1" aria-label="select page"
+                onchange="selectPage(this.value)">
+                <option value="0" selected>0</option>
+            </select>
+        </div>
 
         <h1 class="text-light">Grape View</h1>
 
@@ -21,7 +35,7 @@
         <br />
 
         <div class="col-3">
-            <label for="select_folder" class="form-label text-light">Select Images folder</label>
+            <label for="select_folder" class="form-label text-light">開啟圖片資料夾/目錄 Select Images folder</label>
 
             <input class="form-control" id="select_folder" type="file" webkitdirectory multiple
                 onchange="readFiles(this.files)">
@@ -31,7 +45,7 @@
         <div class="col-3">
             <p class=" text-light">Or</p>
 
-            <label for="select_zip" class="form-label text-light">Select zip</label>
+            <label for="select_zip" class="form-label text-light">開啟圖片壓縮檔 Select images zip</label>
 
             <input class="form-control" id="select_zip" type="file" accept=".zip" onchange="unzipReadFiles(this.files)">
 
@@ -45,6 +59,8 @@
 
         <div id="div_imgs"></div>
 
+
+
     </div>
 
     <script src=" https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
@@ -54,6 +70,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <script type="text/javascript">
+
+
+
+
 
         function readFiles(files) {
 
@@ -188,8 +208,25 @@
         // 將圖片加入圖片區
         function appendImg(index, imgSrc) {
 
-            $('#div_imgs').append('<p>' + index + '</p>');
+            $('#div_imgs').append('<p id="' + index + '">' + index + '</p>');
             $('#div_imgs').append('<img src="' + imgSrc + '"/>');
+            $('#page_select').append($('<option>', { value: index, text: index }));
+        }
+
+        // 回到頁面頂端
+        function topFunction() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+
+
+        // 選取頁碼
+        function selectPage(page) {
+
+            document.getElementById(page).scrollIntoView({
+                behavior: "smooth",  // 平滑滾動
+                block: "start",      // 將元素的哪個部分對齊到可視區域（start, center, end, nearest）
+            });
         }
 
     </script>
