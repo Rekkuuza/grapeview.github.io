@@ -32,11 +32,11 @@
 
             <select id="page_select" class="form-select form-select-lg mb-1" aria-label="select page"
                 onchange="selectPage(this.value)">
-                <option value="0" selected>0</option>
+                <!-- <option value="0" selected>0</option> -->
             </select>
         </div>
         <br />
-        <h1 class="text-light">Grape View</h1>
+        <h1 class="text-light">🍇 Grape View</h1>
 
         <br />
         <br />
@@ -51,17 +51,22 @@
                         File
                     </button>
                     <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
-                        <li><button class="dropdown-item" onclick="showFolderPicker()">📁&ensp;Open Folder</button></li>
+                        <li><button class="dropdown-item" onclick="showImagePicker()">
+                                <i class="bi bi-image"></i>
+                                &ensp;Open Image</button></li>
+                        <li><button class="dropdown-item" onclick="showFolderPicker()">
+                                <i class="bi bi-folder2-open"></i>
+                                &ensp;Open Folder</button></li>
                         <li><button class="dropdown-item" onclick="showZipFilePicker()">
                                 <i class="bi bi-file-earmark-zip"></i>
-                                &ensp;Open Zip File</button></li>
+                                &ensp;Open Zip</button></li>
 
                     </ul>
                 </div>
             </div>
 
             <!-- 隱藏開啟檔案(不支援API瀏覽器用) -->
-            <div class="col">
+            <!-- <div class="col">
 
                 <div>
                     <button class="btn btn-secondary collapse-button" data-bs-toggle="collapse"
@@ -90,7 +95,7 @@
                     </div>
                 </div>
 
-            </div>
+            </div> -->
 
         </div>
 
@@ -121,6 +126,26 @@
     <script type="text/javascript">
 
 
+        async function showImagePicker() {
+
+
+            const options = {
+                types: [{
+                    description: 'Images',
+                    accept: {
+                        'image/*': ['.png', '.gif', '.jpeg', '.jpg', '.webp', '.avif']
+                    }
+                }]
+            };
+
+            const [fileHandle] = await window.showOpenFilePicker(options);
+            const file = await fileHandle.getFile();
+            const imgSrc = URL.createObjectURL(file);
+
+
+            beforeLoad(file.name);
+            appendImg(file.name, imgSrc);
+        }
 
 
         async function showFolderPicker() {
@@ -215,23 +240,25 @@
         }
 
 
-        const pickerOpts = {
-            types: [
-                {
-                    description: "zip",
-                    accept: {
-                        "application/zip": [".zip"],
-                    },
-                },
-            ],
-            excludeAcceptAllOption: true,
-            multiple: true,
-        };
-
 
         async function showZipFilePicker() {
-            // Open file picker and destructure the result the first handle
-            const [fileHandle] = await window.showOpenFilePicker(pickerOpts);
+
+
+            const options = {
+                types: [
+                    {
+                        description: "zip",
+                        accept: {
+                            "application/zip": [".zip"],
+                        },
+                    },
+                ],
+                excludeAcceptAllOption: true,
+                multiple: true,
+            };
+
+
+            const [fileHandle] = await window.showOpenFilePicker(options);
             const file = await fileHandle.getFile();
 
             UnZipAndShowImg(file);
