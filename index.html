@@ -125,13 +125,10 @@
 
         async function showFolderPicker() {
 
-            // 清空圖片區
-            $('#div_imgs').empty();
-
-            // 清空頁碼選擇
-            $("#page_select").empty();
 
             const dirHandle = await window.showDirectoryPicker();
+
+            beforeLoad(dirHandle.name);
 
             const setImageArrayPromise = new Promise(async (resolve) => {
 
@@ -168,18 +165,13 @@
 
         function readFiles(files) {
 
-            // 清空圖片區
-            $('#div_imgs').empty();
-
-            // 清空頁碼選擇
-            $("#page_select").empty();
 
             // 顯示檔名
             var _path = files[0].webkitRelativePath;
 
             var fileName = _path.substring(0, _path.indexOf('/'));
 
-            $("#p_title").html(fileName);
+            beforeLoad(fileName);
 
 
             // 讀取資料夾中的檔案
@@ -258,14 +250,8 @@
 
         async function UnZipAndShowImg(file) {
 
-            // 清空圖片區
-            $('#div_imgs').empty();
 
-            // 清空頁碼選擇
-            $("#page_select").empty();
-
-            // 顯示檔名
-            $("#p_title").html(file.name);
+            beforeLoad(file.name);
 
 
             const setImageArrayPromise = new Promise(async (resolve) => {
@@ -310,6 +296,18 @@
 
 
 
+        function beforeLoad(fileName) {
+
+
+            // 清空圖片區
+            $('#div_imgs').empty();
+
+            // 清空頁碼選擇
+            $("#page_select").empty();
+
+            // 顯示檔名
+            $("#p_title").html(fileName);
+        }
 
 
 
