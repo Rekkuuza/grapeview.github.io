@@ -19,9 +19,7 @@
 
 <body class="bg-dark">
 
-    <div class="container-xxl">
-
-
+    <div class="container">
 
         <!-- 畫面右下 回到頁面頂端和選擇頁面按鈕 -->
         <div class="bg-primary rounded-2 position-fixed bottom-0 end-0 m-5">
@@ -42,31 +40,56 @@
         <br />
         <br />
         <div class="row">
-            <!-- 下拉選單 -->
-            <div class="col">
+            <div class="col-6">
 
-                <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle btn-lg" type="button" id="dropdownMenuButton2"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        File
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
-                        <li><button class="dropdown-item" onclick="showImagePicker()">
-                                <i class="bi bi-image"></i>
-                                &ensp;Open Image</button></li>
-                        <li><button class="dropdown-item" onclick="showFolderPicker()">
-                                <i class="bi bi-folder2-open"></i>
-                                &ensp;Open Folder</button></li>
-                        <li><button class="dropdown-item" onclick="showZipFilePicker()">
-                                <i class="bi bi-file-earmark-zip"></i>
-                                &ensp;Open Zip</button></li>
+                <!-- 托放圖片框 -->
+                <fieldset id="drop_area" class="border border-4 border-light p-2 position-relative">
 
-                    </ul>
-                </div>
-            </div>
+                    <legend class="text-light float-none w-auto p-2">Drop Files</legend>
 
-            <!-- 隱藏開啟檔案(不支援API瀏覽器用) -->
-            <!-- <div class="col">
+
+                    <!-- 下拉選單 -->
+                    <div class="dropdown position-absolute top-50 start-50 translate-middle">
+
+                        <button class="btn btn-secondary dropdown-toggle btn-lg" type="button" id="dropdownMenuButton2"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            File
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                            <li><button class="dropdown-item" onclick="showImagePicker()">
+                                    <i class="bi bi-image"></i>
+                                    &ensp;Open Image</button></li>
+                            <li><button class="dropdown-item" onclick="showFolderPicker()">
+                                    <i class="bi bi-folder2-open"></i>
+                                    &ensp;Open Folder</button></li>
+                            <li><button class="dropdown-item" onclick="showZipFilePicker()">
+                                    <i class="bi bi-file-earmark-zip"></i>
+                                    &ensp;Open Zip</button></li>
+
+                        </ul>
+
+
+                    </div>
+
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+
+
+                </fieldset>
+
+
+
+
+
+
+                <!-- 隱藏開啟檔案(不支援API瀏覽器用) -->
+                <!-- <div class="col">
 
                 <div>
                     <button class="btn btn-secondary collapse-button" data-bs-toggle="collapse"
@@ -97,13 +120,8 @@
 
             </div> -->
 
+            </div>
         </div>
-
-        <br />
-        <br />
-
-
-
         <br />
         <br />
         <div>
@@ -112,7 +130,6 @@
 
 
         <div id="div_imgs"></div>
-
 
 
     </div>
@@ -126,6 +143,123 @@
     <script type="text/javascript">
 
 
+
+
+        $('#drop_area').on(
+            'dragover',
+            function (e) {
+
+                e.preventDefault();
+                e.stopPropagation();
+
+
+            }
+        )
+
+        $('#drop_area').on(
+            'dragenter',
+            function (e) {
+
+                $("#drop_area").removeClass("border-light").addClass("border-primary");
+
+
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        )
+
+        $('#drop_area').on(
+            'dragleave',
+            function (e) {
+
+                $("#drop_area").removeClass("border-primary").addClass("border-light");
+
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        )
+
+
+        $('#drop_area').on(
+            'drop',
+            function (e) {
+                $("#drop_area").removeClass("border-primary").addClass("border-light");
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                readDropFile(e);
+            }
+        );
+
+
+        // 托放圖片,資料夾(File System Access API)
+        async function readDropFile(e) {
+
+            const fileHandlesPromises = [...e.originalEvent.dataTransfer.items].filter((item) => item.kind === 'file')
+                .map((item) => item.getAsFileSystemHandle());
+
+            let imgFiles = [];
+            let fileName = '';
+
+            for await (const handle of fileHandlesPromises) {
+                if (handle.kind === 'directory') {
+
+                    fileName = handle.name;
+
+
+                    for await (const [name, _handle] of handle.entries()) {
+
+
+                        if (_handle.kind === 'file' && /\.(jpe?g|png|gif|webp|avif)$/i.test(name)) {
+
+
+                            let _file = await _handle.getFile();
+                            let imgSrc = URL.createObjectURL(_file);
+
+
+                            let _img = {};
+                            _img.imgSrc = imgSrc;
+                            _img.name = name;
+
+                            imgFiles.push(_img);
+                        }
+                    };
+
+
+                } else {
+
+                    if (handle.name.endsWith('.zip')) {
+
+                        let file = await handle.getFile();
+                        UnZipAndShowImg(file);
+                        return;
+
+                    } else {
+
+
+                        let file = await handle.getFile();
+                        let imgSrc = URL.createObjectURL(file);
+
+                        let _img = {};
+                        _img.imgSrc = imgSrc;
+                        _img.name = file.name;
+                        imgFiles.push(_img);
+
+                    }
+                }
+            }
+
+            beforeLoad(fileName);
+            loadImages(imgFiles);
+        }
+
+
+
+
+
+
+        // 開啟單一圖片(File System Access API)
         async function showImagePicker() {
 
 
@@ -148,8 +282,8 @@
         }
 
 
+        // 開啟資料夾內的圖片(File System Access API)
         async function showFolderPicker() {
-
 
             const dirHandle = await window.showDirectoryPicker();
 
@@ -188,6 +322,7 @@
 
 
 
+        // 開啟資料夾內的圖片(FileReader)
         function readFiles(files) {
 
 
@@ -199,11 +334,13 @@
             beforeLoad(fileName);
 
 
+
+
             // 讀取資料夾中的檔案
             const promiseReadFile = (file) =>
                 new Promise((resolve, reject) => {
                     const fr = new FileReader();
-                    fr.name = file.name.substring(0, file.name.indexOf('.'));
+                    fr.name = file.name;
                     fr.onload = () => resolve(fr);
                     fr.onerror = (err) => reject(err);
                     fr.readAsDataURL(file);
@@ -211,28 +348,25 @@
 
 
             async function setImagesData(fileList) {
-                let imgFiles = [];
+                let fileReaderResults = [];
 
                 const frPromises = fileList.map(promiseReadFile);
 
                 try {
-                    imgFiles = await Promise.all(frPromises);
+                    fileReaderResults = await Promise.all(frPromises);
                 } catch (err) {
                     console.error(err);
                     return;
                 }
 
-                // 圖片排序
-                imgFiles.sort((a, b) => {
-                    return parseInt(a.name) - parseInt(b.name);
+                let imgFiles = fileReaderResults.map(fr => {
+                    return {
+                        name: fr.name,
+                        imgSrc: fr.result
+                    };
                 });
 
-                // 加載圖片
-                imgFiles.forEach((fr, index) => {
-
-                    appendImg(index + 1, fr.result);
-
-                });
+                loadImages(imgFiles);
             }
 
             setImagesData([...files]);
@@ -240,7 +374,7 @@
         }
 
 
-
+        // 開啟壓縮檔內的圖片(File System Access API)
         async function showZipFilePicker() {
 
 
@@ -266,6 +400,7 @@
 
 
 
+        // 開啟壓縮檔內的圖片(from input)
         async function ZipFilePicker(files) {
 
             const file = files[0];
@@ -276,10 +411,6 @@
         }
 
         async function UnZipAndShowImg(file) {
-
-
-            beforeLoad(file.name);
-
 
             const setImageArrayPromise = new Promise(async (resolve) => {
 
@@ -317,13 +448,14 @@
 
             setImageArrayPromise.then((imgFiles) => {
 
+                beforeLoad(file.name);
                 loadImages(imgFiles);
             });
         }
 
 
 
-        function beforeLoad(fileName) {
+        function beforeLoad(fileName = '') {
 
 
             // 清空圖片區
@@ -341,13 +473,20 @@
 
         function loadImages(imgFiles) {
 
+
+
+
             // 圖片排序
             imgFiles.sort((a, b) => {
-                return parseInt(a.name) - parseInt(b.name);
+
+                let _a = a.name.match(/\d+/g);
+                let _b = b.name.match(/\d+/g);
+
+                return parseInt(_a) - parseInt(_b);
             });
 
-            // 加載圖片
 
+            // 加載圖片
             imgFiles.forEach((fr) => {
 
                 appendImg(fr.name, fr.imgSrc);
@@ -374,7 +513,7 @@
         function selectPage(page) {
 
             document.getElementById(page).scrollIntoView({
-                behavior: "smooth",  // 平滑滾動
+                behavior: "instant",  // smooth, instant, auto
                 block: "start",      // 將元素的哪個部分對齊到可視區域（start, center, end, nearest）
             });
         }
