@@ -15,123 +15,185 @@
 
         margin: auto auto 1em auto;
     }
+
+    .scrollImageDiv {
+
+        overflow-y: auto;
+        height: 95vh;
+    }
 </style>
 
 <body class="bg-dark">
 
-    <div class="container">
-
-        <!-- 畫面右下 回到頁面頂端和選擇頁面按鈕 -->
-        <div class="bg-primary rounded-2 position-fixed bottom-0 end-0 m-5">
-
-            <button class="btn btn-primary btn-lg m-2 " onclick="topFunction()" id="btn_top">
-                <span class="bi bi-airplane-fill"></span>
-            </button>
-
-            <select id="page_select" class="form-select form-select-lg mb-1" aria-label="select page"
-                onchange="selectPage(this.value)">
-                <!-- <option value="0" selected>0</option> -->
-            </select>
-        </div>
+    <div id="container_div" class="container-xxl">
         <br />
         <h1 class="text-light">🍇 Grape View</h1>
 
         <br />
         <br />
         <br />
+        <div class="form-check form-switch ms-2">
+            <input class="form-check-input h5" type="checkbox" id="flexSwitchCheckDefault" onchange="wideSwitch(this)">
+            <label class="form-check-label text-light h5" for="flexSwitchCheckDefault">Wide Mode 🞕 </label>
+        </div>
+        <br />
+
         <div class="row">
-            <div class="col-6">
+            <div id="trunk_div" class="position-relative col-12">
 
-                <!-- 托放圖片框 -->
-                <fieldset id="drop_area" class="border border-4 border-light p-2 position-relative">
+                <!-- 功能區1 -->
+                <div class="row">
+                    <!-- 托放圖片框1 -->
+                    <div class="col-8">
+                        <fieldset id="drop_area" class="border border-4 border-light p-2 position-relative">
 
-                    <legend class="text-light float-none w-auto p-2">Drop Files</legend>
-
-
-                    <!-- 下拉選單 -->
-                    <div class="dropdown position-absolute top-50 start-50 translate-middle">
-
-                        <button class="btn btn-secondary dropdown-toggle btn-lg" type="button" id="dropdownMenuButton2"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            File
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
-                            <li><button class="dropdown-item" onclick="showImagePicker()">
-                                    <i class="bi bi-image"></i>
-                                    &ensp;Open Image</button></li>
-                            <li><button class="dropdown-item" onclick="showFolderPicker()">
-                                    <i class="bi bi-folder2-open"></i>
-                                    &ensp;Open Folder</button></li>
-                            <li><button class="dropdown-item" onclick="showZipFilePicker()">
-                                    <i class="bi bi-file-earmark-zip"></i>
-                                    &ensp;Open Zip</button></li>
-
-                        </ul>
+                            <legend class="text-light float-none w-auto p-2">Drop Files</legend>
 
 
+                            <!-- 下拉選單1 -->
+                            <div class="dropdown position-absolute top-50 start-50 translate-middle">
+
+                                <button class="btn btn-secondary dropdown-toggle btn-lg" type="button"
+                                    id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                    File
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton">
+                                    <li><button class="dropdown-item" onclick="showImagePicker('1')">
+                                            <i class="bi bi-image"></i>
+                                            &ensp;Open Image</button></li>
+                                    <li><button class="dropdown-item" onclick="showFolderPicker('1')">
+                                            <i class="bi bi-folder2-open"></i>
+                                            &ensp;Open Folder</button></li>
+                                    <li><button class="dropdown-item" onclick="showZipFilePicker('1')">
+                                            <i class="bi bi-file-earmark-zip"></i>
+                                            &ensp;Open Zip</button></li>
+
+                                </ul>
+
+
+                            </div>
+
+                            <br />
+                            <br />
+                            <br />
+                            <br />
+                            <br />
+                            <br />
+                            <br />
+                            <br />
+
+
+                        </fieldset>
                     </div>
 
-                    <br />
-                    <br />
-                    <br />
-                    <br />
-                    <br />
-                    <br />
-                    <br />
-                    <br />
-
-
-                </fieldset>
 
 
 
+                    <!-- 打開第二分圖片區 -->
+                    <div class="col position-relative">
+                        <button id="btn_branch" type="button"
+                            class="btn btn-secondary btn-lg rounded-circle position-absolute top-50 start-50 translate-middle"
+                            onclick="toggleBranch()"><i class="bi bi-plus"></i></button>
+                    </div>
 
 
+                </div> <!-- 功能區 -->
+                <br />
+                <br />
+                <!-- 圖片標題1 -->
+                <p class="text-light" id="p_title"></p>
 
-                <!-- 隱藏開啟檔案(不支援API瀏覽器用) -->
-                <!-- <div class="col">
 
-                <div>
-                    <button class="btn btn-secondary collapse-button" data-bs-toggle="collapse"
-                        data-bs-target="#collapse_input_file">
-                        Not Support File System Access API Browser▼
+                <!-- 圖片區1 -->
+                <div id="div_imgs"></div>
+
+                <!-- 畫面右下 回到頁面頂端和選擇頁面按鈕1 -->
+                <div id="flyPage" class="bg-primary rounded-2 position-fixed bottom-0 end-0 m-5">
+
+                    <button class="btn btn-primary btn-lg m-2 " onclick="topFunction()" id="btn_top">
+                        <span class="bi bi-airplane-fill"></span>
                     </button>
+
+                    <select id="page_select" class="form-select form-select-lg mb-1" aria-label="select page"
+                        onchange="selectPage(this.value, '1')">
+                        <!-- <option value="0" selected>0</option> -->
+                    </select>
                 </div>
-                <div id="collapse_input_file" class="collapse">
-                    <div class="d-flex flex-wrap">
+            </div> <!-- trunk_div -->
 
-                        <label for="select_folder" class="form-label text-light">開啟圖片資料夾/目錄 Select Images folder</label>
+            <div id="branch_div" class="col-0" style="display: none;">
 
-                        <input class="form-control" id="select_folder" type="file" webkitdirectory multiple
-                            onchange="readFiles(this.files)">
+                <!-- 功能區2 -->
+                <div class="row">
+                    <!-- 托放圖片框2 -->
+                    <div class="col-8">
+                        <fieldset id="drop_area2" class="border border-4 border-light p-2 position-relative">
+
+                            <legend class="text-light float-none w-auto p-2">Drop Files</legend>
+
+
+                            <!-- 下拉選單2 -->
+                            <div class="dropdown position-absolute top-50 start-50 translate-middle">
+
+                                <button class="btn btn-secondary dropdown-toggle btn-lg" type="button"
+                                    id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                                    File
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                                    <li><button class="dropdown-item" onclick="showImagePicker('2')">
+                                            <i class="bi bi-image"></i>
+                                            &ensp;Open Image</button></li>
+                                    <li><button class="dropdown-item" onclick="showFolderPicker('2')">
+                                            <i class="bi bi-folder2-open"></i>
+                                            &ensp;Open Folder</button></li>
+                                    <li><button class="dropdown-item" onclick="showZipFilePicker('2')">
+                                            <i class="bi bi-file-earmark-zip"></i>
+                                            &ensp;Open Zip</button></li>
+
+                                </ul>
+
+
+                            </div>
+
+                            <br />
+                            <br />
+                            <br />
+                            <br />
+                            <br />
+                            <br />
+                            <br />
+                            <br />
+
+
+                        </fieldset>
                     </div>
-                    <br />
 
-                    <div>
-                        <p class=" text-light">Or</p>
 
-                        <label for="select_zip" class="form-label text-light">開啟圖片壓縮檔 Select images zip</label>
+                </div> <!-- 功能區 -->
+                <br />
+                <br />
+                <!-- 圖片標題2 -->
+                <p class="text-light" id="p_title2"></p>
 
-                        <input class="form-control" id="select_zip" type="file" accept=".zip"
-                            onchange="ZipFilePicker(this.files)">
 
-                    </div>
+                <!-- 圖片區 2-->
+                <div id="div_imgs2" class="scrollImageDiv"></div>
+
+                <!-- 畫面右下 回到頁面頂端和選擇頁面按鈕 -->
+                <div id="flyPage2" class="bg-success rounded-2 position-fixed bottom-0 end-0 m-5">
+
+                    <button class="btn btn-success btn-lg m-2 " onclick="topFunction()" id="btn_top2">
+                        <span class="bi bi-airplane-fill"></span>
+                    </button>
+
+                    <select id="page_select2" class="form-select form-select-lg mb-1" aria-label="select page"
+                        onchange="selectPage(this.value,'2')">
+                        <!-- <option value="0" selected>0</option> -->
+                    </select>
                 </div>
-
-            </div> -->
-
-            </div>
+            </div> <!-- branch_div -->
         </div>
-        <br />
-        <br />
-        <div>
-            <p class=" text-light" id="p_title"></p>
-        </div>
-
-
-        <div id="div_imgs"></div>
-
-
+    </div>
     </div>
 
     <script src=" https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
@@ -143,16 +205,60 @@
     <script type="text/javascript">
 
 
+        // 切換寬螢幕模式
+        function wideSwitch(element) {
+
+            if (element.checked) {
+
+                $('#container_div').removeClass('container-xxl').addClass('container-fluid');
+
+            } else {
+
+                $('#container_div').removeClass('container-fluid').addClass('container-xxl');
+            }
+        }
 
 
+        // 切換分支顯示
+        function toggleBranch() {
+
+            $("#branch_div").toggle();
+
+            var display = $("#branch_div").css("display") === "none" ? false : true;
+
+            if (display) {
+
+
+                // show branch
+
+                $('#btn_branch').html('<i class="bi bi-dash"></i>');
+                $('#trunk_div').addClass('col-6').removeClass('col-12');
+                $('#branch_div').addClass('col-6').removeClass('col-0');
+
+                $('#flyPage').removeClass('end-0').addClass('start-0');
+
+                $('#div_imgs').addClass('scrollImageDiv');
+
+            } else {
+
+                // hide branch
+                $('#btn_branch').html('<i class="bi bi-plus"></i>');
+                $('#trunk_div').addClass('col-12').removeClass('col-6');
+                $('#branch_div').addClass('col-0').removeClass('col-6');
+
+                $('#flyPage').removeClass('start-0').addClass('end-0');
+
+                $('#div_imgs').removeClass('scrollImageDiv');
+            }
+        }
+
+        // 托放區1
         $('#drop_area').on(
             'dragover',
             function (e) {
 
                 e.preventDefault();
                 e.stopPropagation();
-
-
             }
         )
 
@@ -161,8 +267,6 @@
             function (e) {
 
                 $("#drop_area").removeClass("border-light").addClass("border-primary");
-
-
                 e.preventDefault();
                 e.stopPropagation();
             }
@@ -188,13 +292,66 @@
                 e.preventDefault();
                 e.stopPropagation();
 
-                readDropFile(e);
+                readDropFile(e, '1');
             }
         );
 
 
+        // 托放區2
+        $('#drop_area2').on(
+            'dragover',
+            function (e) {
+
+                e.preventDefault();
+                e.stopPropagation();
+
+
+            }
+        )
+
+        $('#drop_area2').on(
+            'dragenter',
+            function (e) {
+
+                $("#drop_area2").removeClass("border-light").addClass("border-success");
+
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        )
+
+        $('#drop_area2').on(
+            'dragleave',
+            function (e) {
+
+                $("#drop_area2").removeClass("border-success").addClass("border-light");
+
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        )
+
+
+        $('#drop_area2').on(
+            'drop',
+            function (e) {
+                $("#drop_area2").removeClass("border-success").addClass("border-light");
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                readDropFile(e, '2');
+            }
+        );
+
+
+
+
+
+
+
         // 托放圖片,資料夾(File System Access API)
-        async function readDropFile(e) {
+        async function readDropFile(e, area = '1') {
 
             const fileHandlesPromises = [...e.originalEvent.dataTransfer.items].filter((item) => item.kind === 'file')
                 .map((item) => item.getAsFileSystemHandle());
@@ -232,7 +389,7 @@
                     if (handle.name.endsWith('.zip')) {
 
                         let file = await handle.getFile();
-                        UnZipAndShowImg(file);
+                        UnZipAndShowImg(file.area);
                         return;
 
                     } else {
@@ -250,8 +407,8 @@
                 }
             }
 
-            beforeLoad(fileName);
-            loadImages(imgFiles);
+            beforeLoad(fileName, area);
+            loadImages(imgFiles, area);
         }
 
 
@@ -260,7 +417,7 @@
 
 
         // 開啟單一圖片(File System Access API)
-        async function showImagePicker() {
+        async function showImagePicker(area = '1') {
 
 
             const options = {
@@ -277,17 +434,16 @@
             const imgSrc = URL.createObjectURL(file);
 
 
-            beforeLoad(file.name);
-            appendImg(file.name, imgSrc);
+            beforeLoad(file.name, area);
+            appendImg(file.name, imgSrc, area);
         }
 
 
         // 開啟資料夾內的圖片(File System Access API)
-        async function showFolderPicker() {
+        async function showFolderPicker(area = '1') {
 
             const dirHandle = await window.showDirectoryPicker();
 
-            beforeLoad(dirHandle.name);
 
             const setImageArrayPromise = new Promise(async (resolve) => {
 
@@ -316,66 +472,16 @@
 
             setImageArrayPromise.then((imgFiles) => {
 
-                loadImages(imgFiles);
+
+                beforeLoad(dirHandle.name, area);
+                loadImages(imgFiles, area);
             });
         }
 
 
 
-        // 開啟資料夾內的圖片(FileReader)
-        function readFiles(files) {
-
-
-            // 顯示檔名
-            var _path = files[0].webkitRelativePath;
-
-            var fileName = _path.substring(0, _path.indexOf('/'));
-
-            beforeLoad(fileName);
-
-
-
-
-            // 讀取資料夾中的檔案
-            const promiseReadFile = (file) =>
-                new Promise((resolve, reject) => {
-                    const fr = new FileReader();
-                    fr.name = file.name;
-                    fr.onload = () => resolve(fr);
-                    fr.onerror = (err) => reject(err);
-                    fr.readAsDataURL(file);
-                });
-
-
-            async function setImagesData(fileList) {
-                let fileReaderResults = [];
-
-                const frPromises = fileList.map(promiseReadFile);
-
-                try {
-                    fileReaderResults = await Promise.all(frPromises);
-                } catch (err) {
-                    console.error(err);
-                    return;
-                }
-
-                let imgFiles = fileReaderResults.map(fr => {
-                    return {
-                        name: fr.name,
-                        imgSrc: fr.result
-                    };
-                });
-
-                loadImages(imgFiles);
-            }
-
-            setImagesData([...files]);
-
-        }
-
-
         // 開啟壓縮檔內的圖片(File System Access API)
-        async function showZipFilePicker() {
+        async function showZipFilePicker(area = '1') {
 
 
             const options = {
@@ -395,22 +501,11 @@
             const [fileHandle] = await window.showOpenFilePicker(options);
             const file = await fileHandle.getFile();
 
-            UnZipAndShowImg(file);
+            UnZipAndShowImg(file, area);
         }
 
-
-
-        // 開啟壓縮檔內的圖片(from input)
-        async function ZipFilePicker(files) {
-
-            const file = files[0];
-
-            if (!file) return;
-
-            UnZipAndShowImg(file);
-        }
-
-        async function UnZipAndShowImg(file) {
+        // 解壓縮並顯示圖片
+        async function UnZipAndShowImg(file, area = '1') {
 
             const setImageArrayPromise = new Promise(async (resolve) => {
 
@@ -433,11 +528,11 @@
 
 
 
-                        //  var _filename = filename.substring(filename.indexOf('/') + 1, filename.lastIndexOf('.'));
+                        var _filename = filename.substring(filename.indexOf('/') + 1, filename.length);
 
                         var _img = {};
                         _img.imgSrc = imgSrc;
-                        _img.name = filename;
+                        _img.name = _filename;
 
                         imgFiles.push(_img);
                     }
@@ -448,32 +543,41 @@
 
             setImageArrayPromise.then((imgFiles) => {
 
-                beforeLoad(file.name);
-                loadImages(imgFiles);
+                beforeLoad(file.name, area);
+                loadImages(imgFiles, area);
             });
         }
 
 
+        // 在載入圖片前清空圖片區和頁碼選擇
+        function beforeLoad(fileName = '', area = '1') {
 
-        function beforeLoad(fileName = '') {
+            let div_imgs = '#div_imgs';
+            let page_select = '#page_select';
+            let p_title = '#p_title';
 
+            if (area == '2') {
+
+                div_imgs = '#div_imgs2';
+                page_select = '#page_select2';
+                p_title = '#p_title2';
+
+            }
 
             // 清空圖片區
-            $('#div_imgs').empty();
+            $(div_imgs).empty();
 
             // 清空頁碼選擇
-            $("#page_select").empty();
+            $(page_select).empty();
 
             // 顯示檔名
-            $("#p_title").html(fileName);
+            $(p_title).html(fileName);
         }
 
 
 
-
-        function loadImages(imgFiles) {
-
-
+        // 加載圖片
+        function loadImages(imgFiles, area = '1') {
 
 
             // 圖片排序
@@ -489,22 +593,39 @@
             // 加載圖片
             imgFiles.forEach((fr) => {
 
-                appendImg(fr.name, fr.imgSrc);
+                appendImg(fr.name, fr.imgSrc, area);
             });
         }
 
 
         // 將圖片加入圖片區
-        function appendImg(name, imgSrc) {
+        function appendImg(name, imgSrc, area = '1') {
 
-            $('#div_imgs').append('<p id="' + name + '">' + name + '</p>');
+
+            let div_imgs = '#div_imgs';
+            let page_select = '#page_select';
+
+
+            if (area == '2') {
+
+                div_imgs = '#div_imgs2';
+                page_select = '#page_select2';
+            }
+
+
+            const p = document.createElement("p");
+            p.innerText = name;
+            let _pid = 'area' + area + name;
+            p.setAttribute("id", _pid);
+            $(div_imgs).append(p);
+
 
             const img = document.createElement('img');
             img.src = imgSrc;
             img.className = 'img-fluid';
 
-            $('#div_imgs').append(img);
-            $('#page_select').append($('<option>', { value: name, text: name }));
+            $(div_imgs).append(img);
+            $(page_select).append($('<option>', { value: name, text: name }));
         }
 
         // 回到頁面頂端
@@ -515,9 +636,11 @@
 
 
         // 選取頁碼
-        function selectPage(page) {
+        function selectPage(name, area = '1') {
 
-            document.getElementById(page).scrollIntoView({
+            let _pid = 'area' + area + name;
+
+            document.getElementById(_pid).scrollIntoView({
                 behavior: "instant",  // smooth, instant, auto
                 block: "start",      // 將元素的哪個部分對齊到可視區域（start, center, end, nearest）
             });
