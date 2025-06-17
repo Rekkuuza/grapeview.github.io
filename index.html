@@ -17,9 +17,7 @@
     }
 
     .scrollImageDiv {
-
         overflow-y: auto;
-        height: 95vh;
     }
 </style>
 
@@ -67,6 +65,10 @@
                                     <li><button class="dropdown-item" onclick="showZipFilePicker('1')">
                                             <i class="bi bi-file-earmark-zip"></i>
                                             &ensp;Open Zip</button></li>
+                                    <li><button class="dropdown-item" onclick="showPdfFilePicker('1')">
+                                            <i class="bi bi-filetype-pdf"></i>
+                                            &ensp;Open PDF</button></li>
+
 
                                 </ul>
 
@@ -105,7 +107,7 @@
 
 
                 <!-- 圖片區1 -->
-                <div id="div_imgs"></div>
+                <div id="div_imgs" style="height:100vh"></div>
 
                 <!-- 畫面右下 回到頁面頂端和選擇頁面按鈕1 -->
                 <div id="flyPage" class="bg-primary rounded-2 position-fixed bottom-0 end-0 m-5">
@@ -149,6 +151,10 @@
                                     <li><button class="dropdown-item" onclick="showZipFilePicker('2')">
                                             <i class="bi bi-file-earmark-zip"></i>
                                             &ensp;Open Zip</button></li>
+                                    <li><button class="dropdown-item" onclick="showPdfFilePicker('2')">
+                                            <i class="bi bi-filetype-pdf"></i>
+                                            &ensp;Open PDF</button></li>
+
 
                                 </ul>
 
@@ -177,7 +183,7 @@
 
 
                 <!-- 圖片區 2-->
-                <div id="div_imgs2" class="scrollImageDiv"></div>
+                <div id="div_imgs2" class="scrollImageDiv" style="height:100vh"></div>
 
                 <!-- 畫面右下 回到頁面頂端和選擇頁面按鈕 -->
                 <div id="flyPage2" class="bg-success rounded-2 position-fixed bottom-0 end-0 m-5">
@@ -389,10 +395,18 @@
                     if (handle.name.endsWith('.zip')) {
 
                         let file = await handle.getFile();
-                        UnZipAndShowImg(file.area);
+                        UnZipAndShowImg(file, area);
                         return;
 
-                    } else {
+                    }
+                    if (handle.name.endsWith('.pdf')) {
+
+                        let file = await handle.getFile();
+                        openPdfFile(file, area);
+                        return;
+
+                    }
+                    else {
 
 
                         let file = await handle.getFile();
@@ -546,6 +560,44 @@
                 beforeLoad(file.name, area);
                 loadImages(imgFiles, area);
             });
+        }
+
+        async function showPdfFilePicker(area = '1') {
+
+            const options = {
+                types: [
+                    {
+                        description: 'PDF files',
+                        accept: {
+                            'application/pdf': ['.pdf']
+                        },
+                    },
+                ]
+            };
+
+
+
+            const [fileHandle] = await window.showOpenFilePicker(options);
+            const file = await fileHandle.getFile();
+            openPdfFile(file, area);
+        }
+
+        function openPdfFile(file, area = '1') {
+
+            const blobURL = URL.createObjectURL(file);
+
+            const embed = document.createElement('embed');
+            embed.src = blobURL;
+            embed.type = 'application/pdf';
+            embed.width = '100%';
+            embed.height = '100%';
+            embed.style.maxHeight = '95vh';
+
+
+            let div_imgs = (area == '1') ? '#div_imgs' : '#div_imgs2';
+
+            beforeLoad('', area);
+            $(div_imgs).append(embed);
         }
 
 
