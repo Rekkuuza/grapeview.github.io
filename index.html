@@ -845,6 +845,8 @@
             });
 
             $('#carouselControls').show(); // 顯示輪播控制
+            window.scrollTo(0, document.body.scrollHeight);
+
         }
 
         // 回到頁面頂端
@@ -921,7 +923,12 @@
 
             if (display) {
 
-                $('#midFlyFunction').toggle();
+                setTimeout(function () {
+
+                    $('#midFlyFunction').toggle();
+
+                }, 6000);
+
             }
         });
 
