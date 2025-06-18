@@ -210,6 +210,8 @@
 
     <script type="text/javascript">
 
+        const supportImageFormats = ['.png', '.gif', '.jpeg', '.jpg', '.webp', '.avif'];
+
 
         // 切換寬螢幕模式
         function wideSwitch(element) {
@@ -466,7 +468,7 @@
                 for await (const [name, handle] of dirHandle.entries()) {
 
 
-                    if (handle.kind === 'file' && /\.(jpe?g|png|gif|webp|avif)$/i.test(name)) {
+                    if (handle.kind === 'file' && supportImageFormats.some(ext => name.toLowerCase().endsWith(ext))) {
 
 
                         let _file = await handle.getFile();
@@ -534,7 +536,7 @@
 
                     const fileData = zip.files[filename];
 
-                    if (!fileData.dir && /\.(jpe?g|png|gif|webp|bmp|avif)$/i.test(filename)) {
+                    if (!fileData.dir && supportImageFormats.some(ext => filename.toLowerCase().endsWith(ext))) {
 
 
                         const blob = await fileData.async('blob');
@@ -647,6 +649,8 @@
 
                 appendImg(fr.name, fr.imgSrc, area);
             });
+
+            selectPage(imgFiles[0].name, area); // 預設選擇第一張圖片
         }
 
 
