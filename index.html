@@ -919,17 +919,18 @@
 
             if (!$('#OnePicSwitch').prop('checked')) return;
 
-            var display = $("#midFlyFunction").css("display") === "none" ? false : true;
+            clearTimeout(this.setTimeout);
 
-            if (display) {
+            this.setTimeout = setTimeout(function () {
 
-                setTimeout(function () {
+                var display = $("#midFlyFunction").css("display") === "none" ? false : true;
 
+                if (display) {
                     $('#midFlyFunction').toggle();
+                }
 
-                }, 6000);
+            }, 6000);
 
-            }
         });
 
         // 顯示中下方頁碼選取
