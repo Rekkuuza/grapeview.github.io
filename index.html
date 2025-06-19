@@ -45,14 +45,14 @@
             <label class="form-check-label text-light h5" for="wideSwitch">Wide Mode</label>
         </div>
         <div class="form-check form-switch ms-2">
-            <input class="form-check-input h5" type="checkbox" id="OnePicSwitch" onchange="OnePicSwitch(this)">
+            <input class="form-check-input h5" type="checkbox" id="OnePicSwitch" onchange="setPageMode(1)">
             <label class="form-check-label text-light h5" for="OnePicSwitch">One Pic Mode</label>
 
         </div>
         <br />
 
         <div class="row">
-            <div id="trunk_div" class="position-relative col-12">
+            <div id="div_trunk" class="position-relative col-12">
 
                 <!-- 功能區1 -->
                 <div class="row">
@@ -106,11 +106,19 @@
 
 
 
-                    <!-- 打開第二分圖片區 -->
+
                     <div class="col position-relative">
-                        <button id="btn_branch" type="button"
-                            class="btn btn-secondary btn-lg rounded-circle position-absolute top-50 start-50 translate-middle"
-                            onclick="toggleBranch()"><i class="bi bi-plus"></i></button>
+                        <div class="position-absolute top-50 start-50 translate-middle">
+                            <!-- 打開第二分圖片區 -->
+                            <button id="btn_branch" type="button" class="btn btn-secondary btn-lg rounded-circle"
+                                onclick="setPageMode(2)"><i class="bi bi-plus"></i></button>
+                            <br />
+                            <br />
+
+                            <!-- <button id="btn_ocr" type="button" class="btn btn-secondary btn-lg"
+                                onclick="setPageMode(3)">OCR</button> -->
+
+                        </div>
                     </div>
 
 
@@ -125,9 +133,10 @@
                 <div id="div_imgs" style="height:100vh"></div>
 
                 <!-- 單一圖片模式時的輪播 -->
-                <div id="carouselControls" class="carousel slide" style="display: none">
-                    <div id="carouselInner" class="carousel-inner">
-                        <!-- <div class="carousel-item active">
+                <div id="div_carousel_area" style="display: none">
+                    <div id="carouselControls" class="carousel slide">
+                        <div id="carouselInner" class="carousel-inner">
+                            <!-- <div class="carousel-item active">
                             <img src="..." class="d-block w-100" alt="...">
                         </div>
                         <div class="carousel-item">
@@ -136,23 +145,23 @@
                         <div class="carousel-item">
                             <img src="..." class="d-block w-100" alt="...">
                         </div> -->
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselControls"
+                            data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true" data-bs-toggle="tooltip"
+                                data-bs-placement="top" title="Previous">
+                            </span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselControls"
+                            data-bs-slide="next">
+                            <span class="carousel-control-next-icon " aria-hidden="true" aria-hidden="true"
+                                data-bs-toggle="tooltip" data-bs-placement="top" title="Next">
+                            </span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
                     </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselControls"
-                        data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true" data-bs-toggle="tooltip"
-                            data-bs-placement="top" title="Previous">
-                        </span>
-                        <span class="visually-hidden">Previous</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#carouselControls"
-                        data-bs-slide="next">
-                        <span class="carousel-control-next-icon " aria-hidden="true" aria-hidden="true"
-                            data-bs-toggle="tooltip" data-bs-placement="top" title="Next">
-                        </span>
-                        <span class="visually-hidden">Next</span>
-                    </button>
                 </div>
-
                 <!-- 畫面右下 回到頁面頂端和選擇頁面下拉選單1 -->
                 <div id="flyPage" class="bg-primary rounded-2 position-fixed bottom-0 end-0 m-5">
 
@@ -184,9 +193,9 @@
                     </div>
 
                 </div>
-            </div> <!-- trunk_div -->
+            </div> <!-- div_trunk -->
 
-            <div id="branch_div" class="col-0" style="display: none;">
+            <div id="div_branch" class="col-0" style="display: none;">
 
                 <!-- 功能區2 -->
                 <div class="row">
@@ -260,10 +269,15 @@
                         <!-- <option value="0" selected>0</option> -->
                     </select>
                 </div>
-            </div> <!-- branch_div -->
+            </div> <!-- div_branch -->
+            <div id="div_ocr" class="col-0" style="display: none;">
+                <p class="text-light">hello</p>
+                <p class="text-light">hello</p>
+                <p class="text-light">hello</p>
+            </div>
         </div>
-    </div>
-    </div>
+
+    </div><!-- container_div -->
 
     <script src=" https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
@@ -275,44 +289,182 @@
 
         const supportImageFormats = ['.png', '.gif', '.jpeg', '.jpg', '.webp', '.avif'];
         let tempImgFilesArea1 = []; // 用於存儲圖片檔案的陣列
+        let pageModeNow = 0; // 頁面現在模式
 
-        // 切換單一圖片模式 
-        function OnePicSwitch(element) {
-
-            if (element.checked) {
-
-                // 隱藏分支
-                hideBranch();
-
-                // 切換到寬螢幕模式
-                if (!$('#wideSwitch').prop('checked')) {
-
-                    $('#wideSwitch').click();
-                }
-
-                $('#div_imgs').toggle();
-                $('#carouselControls').toggle();
-                $('#flyPage').toggle();
-
-                let _title1 = $('#p_title').html();
-
-                loadImages(_title1, tempImgFilesArea1, area = '1');
+        /**
+         * 頁面模式切換 
+         * 
+         * @param mode - 0=單區域模式 1=單頁模式 2=雙區域模式  3=OCR模式
+        */
+        function setPageMode(mode) {
 
 
-            } else {
+            if (pageModeNow == mode) {
 
-                $('#div_imgs').toggle();
-                $('#carouselControls').toggle();
-                $('#flyPage').toggle();
-
-                let _title1 = $('#p_title').html();
-                let _title2 = $('#p_title2').html();
-                loadImages(_title1, tempImgFilesArea1, '1');
-                loadImages(_title2, tempImgFilesArea2, '2');
+                pageModeNow = 0;
+                mode = 0;
             }
 
-            document.activeElement.blur();
+            pageModeNow = mode;
+
+            if (mode == 0) {
+                tunckShift(0);
+                OnePicShift(0);
+                branchShift(0);
+                ocrShift(0);
+            }
+
+            if (mode == 1) {
+                tunckShift(0);
+                OnePicShift(1);
+                branchShift(0);
+                ocrShift(0);
+            }
+
+
+            if (mode == 2) {
+                OnePicShift(0);
+                tunckShift(1);
+                branchShift(1);
+                ocrShift(0);
+            }
+
+
+            if (mode == 3) {
+                tunckShift(1);
+                OnePicShift(0);
+                branchShift(0);
+                ocrShift(1);
+            }
+
+
+
+            function tunckShift(status = 0) {
+
+                if (status == 0) {
+
+                    // 區域1 滿版
+                    $('#div_trunk').removeClass('col-6').addClass('col-12');
+
+                    // 區域1 ✈️到右下
+                    $('#flyPage').removeClass('start-0').addClass('end-0');
+
+                    // 區域1圖片 移除卷軸
+                    $('#div_imgs').removeClass('scrollImageDiv');
+                }
+
+
+
+                if (status == 1) {
+
+                    // 區域1 半版
+                    $('#div_trunk').removeClass('col-12').addClass('col-6');
+
+                    // 區域1 ✈️到左下
+                    $('#flyPage').removeClass('end-0').addClass('start-0');
+
+                    // 區域1圖片 加入卷軸
+                    $('#div_imgs').addClass('scrollImageDiv');
+                }
+            }
+
+            function OnePicShift(status = 0) {
+
+                if (status == 0) {
+
+                    // 區域1 顯示
+                    $('#div_imgs').show();
+                    // 區域1 ✈️ 顯示
+                    $('#flyPage').show();
+                    // 輪播 隱藏
+                    $('#div_carousel_area').hide();
+
+                    if ($('#OnePicSwitch').prop('checked')) {
+
+                        $('#OnePicSwitch').prop('checked', false);
+                    }
+                }
+
+                if (status == 1) {
+
+                    // 區域1 隱藏
+                    $('#div_imgs').hide();
+
+                    // 區域1 ✈️ 隱藏
+                    $('#flyPage').hide();
+
+                    // 輪播 顯示
+                    $('#div_carousel_area').show();
+
+                    // 切換到寬螢幕模式
+                    if (!$('#wideSwitch').prop('checked')) {
+
+                        $('#wideSwitch').click();
+                    }
+
+                    // // 輪播載入圖片
+                    // let _title1 = $('#p_title').html();
+
+                    // loadImages(_title1, tempImgFilesArea1, area = '1');
+
+                    // $('#carouselControls').show(); // 顯示輪播控制
+
+                    // 畫面移到最下
+                    window.scrollTo(0, document.body.scrollHeight);
+                }
+            }
+
+
+            function branchShift(status) {
+                if (status == 0) {
+
+                    // 區域2 隱藏
+                    $("#div_branch").hide();
+
+                    // 區域2 寬度0
+                    $('#div_branch').removeClass('col-6').addClass('col-0');
+
+                    // 按鈕換成加號
+                    $('#btn_branch').html('<i class="bi bi-plus"></i>');
+
+                }
+
+                if (status == 1) {
+
+                    // 區域2 顯示
+                    $("#div_branch").show();
+
+                    // 區域2 半版
+                    $('#div_branch').removeClass('col-0').addClass('col-6');
+
+                    // 按鈕換成減號
+                    $('#btn_branch').html('<i class="bi bi-dash"></i>');
+
+
+                }
+            }
+
+            function ocrShift(status) {
+                if (status == 0) {
+
+                    // ocr區 隱藏
+                    $('#div_ocr').hide();
+
+                    // ocr區 寬度0
+                    $('#div_ocr').removeClass('col-6').addClass('col-0');
+
+                }
+                if (status == 1) {
+
+                    // ocr區 顯示
+                    $('#div_ocr').show();
+
+                    // ocr區 半版
+                    $('#div_ocr').removeClass('col-0').addClass('col-6');
+                }
+            }
         }
+
 
         // 切換寬螢幕模式
         function wideSwitch(element) {
@@ -329,59 +481,6 @@
             document.activeElement.blur();
         }
 
-
-        // 切換分支顯示
-        function toggleBranch() {
-
-            $("#branch_div").toggle();
-
-            var display = $("#branch_div").css("display") === "none" ? false : true;
-
-            if (display) {
-
-
-                // show branch
-
-                $('#btn_branch').html('<i class="bi bi-dash"></i>');
-                $('#trunk_div').addClass('col-6').removeClass('col-12');
-                $('#branch_div').addClass('col-6').removeClass('col-0');
-
-                $('#flyPage').removeClass('end-0').addClass('start-0');
-
-                $('#div_imgs').addClass('scrollImageDiv');
-
-
-                // 取消單頁模式
-                if ($('#OnePicSwitch').prop('checked')) {
-
-                    $('#OnePicSwitch').click();
-                }
-
-            } else {
-
-                hideBranch();
-            }
-        }
-
-        function hideBranch() {
-
-            // hide branch
-            $('#btn_branch').html('<i class="bi bi-plus"></i>');
-            $('#trunk_div').addClass('col-12').removeClass('col-6');
-            $('#branch_div').addClass('col-0').removeClass('col-6');
-
-            $('#flyPage').removeClass('start-0').addClass('end-0');
-
-            $('#div_imgs').removeClass('scrollImageDiv');
-
-            var display = $("#branch_div").css("display") === "none" ? false : true;
-            if (display) {
-
-                $("#branch_div").toggle();
-
-            }
-
-        }
 
         // 托放區1
         $('#drop_area').on(
@@ -780,25 +879,19 @@
 
 
 
+            // 加載圖片
+            imgFiles.forEach((fr) => {
 
-            if ($('#OnePicSwitch').prop('checked')) {
+                appendImg(fr.name, fr.imgSrc, area);
+            });
 
-
+            // 加載輪播
+            if (area == '1') {
                 setCarouselInner(imgFiles);
-
-            } else {
-
-                // 加載圖片
-                imgFiles.forEach((fr) => {
-
-                    appendImg(fr.name, fr.imgSrc, area);
-                });
-
-                // 預設選擇第一張圖片       
-                selectPage(imgFiles[0].name, area);
-
             }
 
+            // 選擇第一張圖片       
+            //  selectPage(imgFiles[0].name, area);
         }
 
 
@@ -850,10 +943,6 @@
                 $('#midPageSelect').append($('<option>', { value: fr.name, text: fr.name }));
 
             });
-
-            $('#carouselControls').show(); // 顯示輪播控制
-            window.scrollTo(0, document.body.scrollHeight);
-
         }
 
         // 回到頁面頂端
