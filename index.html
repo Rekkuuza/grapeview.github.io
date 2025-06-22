@@ -115,8 +115,8 @@
                             <br />
                             <br />
 
-                            <!-- <button id="btn_ocr" type="button" class="btn btn-secondary btn-lg"
-                                onclick="setPageMode(3)">OCR</button> -->
+                            <button id="btn_clip" type="button" class="btn btn-secondary btn-lg"
+                                onclick="setPageMode(3)">Clip</button>
 
                         </div>
                     </div>
@@ -270,10 +270,13 @@
                     </select>
                 </div>
             </div> <!-- div_branch -->
-            <div id="div_ocr" class="col-0" style="display: none;">
-                <p class="text-light">hello</p>
-                <p class="text-light">hello</p>
-                <p class="text-light">hello</p>
+            <div id="div_clip" class="col-0" style="display: none;">
+                <dl id="dl_clip">
+                    <!-- <dt>Coffee</dt>
+                    <dd>- black hot drink</dd>
+                    <dt>Milk</dt>
+                    <dd>- white cold drink</dd> -->
+                </dl>
             </div>
         </div>
 
@@ -285,6 +288,7 @@
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
+
     <script type="text/javascript">
 
         const supportImageFormats = ['.png', '.gif', '.jpeg', '.jpg', '.webp', '.avif'];
@@ -294,7 +298,7 @@
         /**
          * 頁面模式切換 
          * 
-         * @param mode - 0=單區域模式 1=單頁模式 2=雙區域模式  3=OCR模式
+         * @param mode - 0=單區域模式 1=單頁模式 2=雙區域模式  3=clip模式
         */
         function setPageMode(mode) {
 
@@ -311,14 +315,14 @@
                 tunckShift(0);
                 OnePicShift(0);
                 branchShift(0);
-                ocrShift(0);
+                clipShift(0);
             }
 
             if (mode == 1) {
                 tunckShift(0);
                 OnePicShift(1);
                 branchShift(0);
-                ocrShift(0);
+                clipShift(0);
             }
 
 
@@ -326,7 +330,7 @@
                 OnePicShift(0);
                 tunckShift(1);
                 branchShift(1);
-                ocrShift(0);
+                clipShift(0);
             }
 
 
@@ -334,7 +338,7 @@
                 tunckShift(1);
                 OnePicShift(0);
                 branchShift(0);
-                ocrShift(1);
+                clipShift(1);
             }
 
 
@@ -402,13 +406,6 @@
                         $('#wideSwitch').click();
                     }
 
-                    // // 輪播載入圖片
-                    // let _title1 = $('#p_title').html();
-
-                    // loadImages(_title1, tempImgFilesArea1, area = '1');
-
-                    // $('#carouselControls').show(); // 顯示輪播控制
-
                     // 畫面移到最下
                     window.scrollTo(0, document.body.scrollHeight);
                 }
@@ -444,23 +441,35 @@
                 }
             }
 
-            function ocrShift(status) {
+            function clipShift(status) {
                 if (status == 0) {
 
                     // ocr區 隱藏
-                    $('#div_ocr').hide();
+                    $('#div_clip').hide();
 
                     // ocr區 寬度0
-                    $('#div_ocr').removeClass('col-6').addClass('col-0');
+                    $('#div_clip').removeClass('col-6').addClass('col-0');
+
+                    $('.a1-image').show();
+                    $('.a1-canvas').hide();
 
                 }
                 if (status == 1) {
 
                     // ocr區 顯示
-                    $('#div_ocr').show();
+                    $('#div_clip').show();
 
                     // ocr區 半版
-                    $('#div_ocr').removeClass('col-0').addClass('col-6');
+                    $('#div_clip').removeClass('col-0').addClass('col-6');
+
+                    // 切換到寬螢幕模式
+                    if (!$('#wideSwitch').prop('checked')) {
+
+                        $('#wideSwitch').click();
+                    }
+
+                    $('.a1-image').hide();
+                    $('.a1-canvas').show();
                 }
             }
         }
@@ -890,8 +899,12 @@
                 setCarouselInner(imgFiles);
             }
 
-            // 選擇第一張圖片       
-            //  selectPage(imgFiles[0].name, area);
+            // clip模式 隱藏圖片
+            if (pageModeNow == 3) {
+                $('.a1-image').hide();
+                $('.a1-canvas').show();
+
+            }
         }
 
 
@@ -913,13 +926,95 @@
 
             const img = document.createElement('img');
             img.src = imgSrc;
-            img.className = 'img-fluid';
+            img.className = 'img-fluid a1-image';
             img.setAttribute("id", _pid);
+            img.onload = drawImageActualSize;
+
+            const canvas = document.createElement('canvas');
+
+            const ctx = canvas.getContext("2d");
+            canvas.setAttribute("id", _pid);
+            canvas.className = 'a1-canvas';
+            canvas.style.cssText = 'display:none';
 
             $(div_imgs).append(img);
+            $(div_imgs).append(canvas);
             $(div_imgs).append('<br>');
             $(page_select).append($('<option>', { value: name, text: name }));
+
+
+            // 圖片轉成canvas
+            // canvas加入滑鼠事件
+            function drawImageActualSize() {
+
+                canvas.width = this.naturalWidth;
+                canvas.height = this.naturalHeight;
+                ctx.drawImage(this, 0, 0, this.width, this.height);
+
+                let orign_image = this;
+
+
+                let isDrawing = false;
+                let startX, startY;
+                let resWidth, resHeight;
+
+                canvas.addEventListener('mousedown', e => {
+
+                    startX = e.offsetX;
+                    startY = e.offsetY;
+                    isDrawing = true;
+                });
+
+                canvas.addEventListener('mousemove', e => {
+
+
+                    if (!isDrawing) return;
+
+                    resWidth = e.offsetX - startX;
+                    resHeight = e.offsetY - startY;
+                    ctx.drawImage(orign_image, 0, 0, canvas.width, canvas.height); // Clear previous drawings
+                    ctx.strokeRect(startX, startY, resWidth, resHeight); // Draw the square
+
+                });
+
+                canvas.addEventListener('mouseup', e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    isDrawing = false;
+
+                    ctx.drawImage(orign_image, 0, 0, canvas.width, canvas.height);
+                    ctx.strokeRect(startX, startY, resWidth, resHeight); // Draw the square
+
+
+                    const canvas_clip = document.createElement('canvas');
+                    const ctx_clip = canvas_clip.getContext("2d");
+                    canvas_clip.width = resWidth;
+                    canvas_clip.height = resHeight;
+
+                    // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+                    ctx_clip.drawImage(orign_image, startX, startY, resWidth, resHeight, 0, 0, resWidth, resHeight);
+                    const dt = document.createElement('dt');
+                    dt.append(ctx_clip);
+
+                    $('#dl_clip').append(canvas_clip);
+                    $('#dl_clip').append('</br>');
+
+                });
+
+                canvas.addEventListener('mouseout', e => {
+                    isDrawing = false;
+                    ctx.drawImage(orign_image, 0, 0, canvas.width, canvas.height);
+
+                });
+            }
+
         }
+
+
+
+
+
 
 
         // 設置輪播內部內容
