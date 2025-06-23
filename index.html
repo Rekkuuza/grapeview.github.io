@@ -28,6 +28,7 @@
 
     .carouselItem {
         height: 100vh;
+        transition-duration: 0s;
     }
 </style>
 
@@ -271,12 +272,30 @@
                 </div>
             </div> <!-- div_branch -->
             <div id="div_clip" class="col-0" style="display: none;">
-                <dl id="dl_clip">
-                    <!-- <dt>Coffee</dt>
+                <div> <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                    <br />
+                </div>
+                <div style="height:100vh;overflow-y:scroll;">
+                    <dl id="dl_clip">
+                        <!-- <dt>Coffee</dt>
                     <dd>- black hot drink</dd>
                     <dt>Milk</dt>
                     <dd>- white cold drink</dd> -->
-                </dl>
+                    </dl>
+                </div>
             </div>
         </div>
 
@@ -922,25 +941,32 @@
                 page_select = '#page_select2';
             }
 
-            let _pid = 'area' + area + name;
 
             const img = document.createElement('img');
             img.src = imgSrc;
             img.className = 'img-fluid a1-image';
-            img.setAttribute("id", _pid);
             img.onload = drawImageActualSize;
 
             const canvas = document.createElement('canvas');
-
             const ctx = canvas.getContext("2d");
-            canvas.setAttribute("id", _pid);
             canvas.className = 'a1-canvas';
             canvas.style.cssText = 'display:none';
 
+            const p = document.createElement('p');
+            let _pid = 'area_' + area + name;
+            p.innerHTML = name;
+            p.setAttribute("id", _pid);
+
+            $(div_imgs).append(p);
             $(div_imgs).append(img);
             $(div_imgs).append(canvas);
             $(div_imgs).append('<br>');
-            $(page_select).append($('<option>', { value: name, text: name }));
+
+            const option = document.createElement('option');
+            option.value = _pid;
+            option.text = name;
+
+            $(page_select).append(option);
 
 
             // 圖片轉成canvas
@@ -995,9 +1021,18 @@
                     // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
                     ctx_clip.drawImage(orign_image, startX, startY, resWidth, resHeight, 0, 0, resWidth, resHeight);
                     const dt = document.createElement('dt');
-                    dt.append(ctx_clip);
+                    const _p_clip = document.createElement('p');
+                    _p_clip.className = 'text-light';
+                    _p_clip.innerHTML = name;
+                    dt.append(_p_clip);
 
-                    $('#dl_clip').append(canvas_clip);
+
+                    const dd = document.createElement('dd');
+                    dd.append(canvas_clip);
+
+
+                    $('#dl_clip').append(dt);
+                    $('#dl_clip').append(dd);
                     $('#dl_clip').append('</br>');
 
                 });
@@ -1048,11 +1083,10 @@
 
 
         // 選取頁碼
-        function selectPage(name, area = '1') {
+        function selectPage(value, area = '1') {
 
-            let _pid = 'area' + area + name;
 
-            document.getElementById(_pid).scrollIntoView({
+            document.getElementById(value).scrollIntoView({
                 behavior: "instant",  // smooth, instant, auto
                 block: "start",      // 將元素的哪個部分對齊到可視區域（start, center, end, nearest）
             });
