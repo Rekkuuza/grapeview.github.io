@@ -38,7 +38,7 @@
         <br />
         <div class="row">
             <div class="col">
-                <h1 class="text-light col">🍇 Grape View</h1>
+                <h1 id="title" class="text-light col">🍇 Grape View</h1>
             </div>
 
             <div class="col">
@@ -1083,8 +1083,12 @@
 
         // 回到頁面頂端
         function topFunction() {
-            document.body.scrollTop = 0;
-            document.documentElement.scrollTop = 0;
+
+            document.getElementById('title').scrollIntoView({
+                behavior: "instant",  // smooth, instant, auto
+                block: "start",      // 將元素的哪個部分對齊到可視區域（start, center, end, nearest）
+            });
+
         }
 
 
