@@ -36,20 +36,26 @@
 
     <div id="container_div" class="container-xxl">
         <br />
-        <h1 class="text-light">🍇 Grape View</h1>
+        <div class="row">
+            <div class="col">
+                <h1 class="text-light col">🍇 Grape View</h1>
+            </div>
+
+            <div class="col">
+                <div class="form-check form-switch ms-2">
+                    <input class="form-check-input h5" type="checkbox" id="wideSwitch" onchange="wideSwitch(this)">
+                    <label class="form-check-label text-light h5" for="wideSwitch">Wide Mode</label>
+                </div>
+
+                <div class="form-check form-switch ms-2">
+                    <input class="form-check-input h5" type="checkbox" id="OnePicSwitch" onchange="setPageMode(1)">
+                    <label class="form-check-label text-light h5" for="OnePicSwitch">One Pic Mode</label>
+
+                </div>
+            </div>
+        </div>
 
         <br />
-        <br />
-        <br />
-        <div class="form-check form-switch ms-2">
-            <input class="form-check-input h5" type="checkbox" id="wideSwitch" onchange="wideSwitch(this)">
-            <label class="form-check-label text-light h5" for="wideSwitch">Wide Mode</label>
-        </div>
-        <div class="form-check form-switch ms-2">
-            <input class="form-check-input h5" type="checkbox" id="OnePicSwitch" onchange="setPageMode(1)">
-            <label class="form-check-label text-light h5" for="OnePicSwitch">One Pic Mode</label>
-
-        </div>
         <br />
 
         <div class="row">
@@ -115,9 +121,9 @@
                                 onclick="setPageMode(2)"><i class="bi bi-plus"></i></button>
                             <br />
                             <br />
-
+                            <!-- 
                             <button id="btn_clip" type="button" class="btn btn-secondary btn-lg"
-                                onclick="setPageMode(3)">Clip</button>
+                                onclick="setPageMode(3)">Clip</button> -->
 
                         </div>
                     </div>
@@ -131,7 +137,7 @@
 
 
                 <!-- 圖片區1 -->
-                <div id="div_imgs" style="height:100vh"></div>
+                <div id="div_imgs" style="height:100vh;text-align: center;"></div>
 
                 <!-- 單一圖片模式時的輪播 -->
                 <div id="div_carousel_area" style="display: none">
@@ -256,7 +262,7 @@
 
 
                 <!-- 圖片區 2-->
-                <div id="div_imgs2" class="scrollImageDiv" style="height:100vh"></div>
+                <div id="div_imgs2" class="scrollImageDiv" style="height:100vh;text-align: center;"></div>
 
                 <!-- 畫面右下 回到頁面頂端和選擇頁面按鈕 -->
                 <div id="flyPage2" class="bg-success rounded-2 position-fixed bottom-0 end-0 m-5">
