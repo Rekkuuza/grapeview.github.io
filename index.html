@@ -132,12 +132,19 @@
                 </div> <!-- 功能區 -->
                 <br />
                 <br />
+                <!-- 影片區域 -->
+                <div id="div_video" hidden>
+                    <video id="video_player" autoplay controls>
+                    </video>
+                </div>
                 <!-- 圖片標題1 -->
                 <p class="text-light" id="p_title"></p>
 
 
                 <!-- 圖片區1 -->
                 <div id="div_imgs" style="height:100vh;text-align: center;"></div>
+
+
 
                 <!-- 單一圖片模式時的輪播 -->
                 <div id="div_carousel_area" style="display: none">
@@ -317,6 +324,7 @@
     <script type="text/javascript">
 
         const supportImageFormats = ['.png', '.gif', '.jpeg', '.jpg', '.webp', '.avif'];
+        const supportVideoFormats = ['.mp3', '.flac', '.mp4', '.webm', '.ogg', '.mkv', '.avi', '.mov', '.flv', '.wmv'];
         let tempImgFilesArea1 = []; // 用於存儲圖片檔案的陣列
         let pageModeNow = 0; // 頁面現在模式
 
@@ -664,6 +672,16 @@
                         return;
 
                     }
+
+                    if (supportVideoFormats.some(fileExtension => handle.name.toLowerCase().endsWith(fileExtension))) {
+
+                        let file = await handle.getFile();
+                        let videoSrc = URL.createObjectURL(file);
+                        $('#video_player').attr('src', videoSrc);
+                        $('#div_video').removeAttr('hidden');
+                        return;
+
+                    }
                     else {
 
 
@@ -728,7 +746,7 @@
                 for await (const [name, handle] of dirHandle.entries()) {
 
 
-                    if (handle.kind === 'file' && supportImageFormats.some(ext => name.toLowerCase().endsWith(ext))) {
+                    if (handle.kind === 'file' && supportImageFormats.some(fileExtension => name.toLowerCase().endsWith(fileExtension))) {
 
 
                         let _file = await handle.getFile();
