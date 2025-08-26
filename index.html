@@ -30,11 +30,6 @@
         height: 100vh;
         transition-duration: 0s;
     }
-
-    .modal-backdrop {
-        opacity: 0 !important;
-        /* 或者使用 background-color: transparent; */
-    }
 </style>
 
 <body class="bg-dark">
@@ -62,13 +57,7 @@
                         <input type="range" class="form-range" min="0" max="400" id="brightnessRange" value="100">
 
                     </div>
-
                 </div>
-
-                <!--   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button> 
-                </div>-->
             </div>
         </div>
     </div>
@@ -221,40 +210,36 @@
                         </button>
                     </div>
                 </div>
-                <!-- 畫面右下 回到頁面頂端和選擇頁面下拉選單1 -->
-                <div id="flyPage" class="bg-primary rounded-2 position-fixed bottom-0 end-0 m-5">
 
 
-                    <button type="button" class="btn btn-primary btn-lg m-1" onclick="topFunction()" id="btn_top">
-                        <span class="bi bi-airplane-fill"></span>
-                    </button>
+                <!-- 畫面中下方工具 -->
+                <div id="bottom_tool_area" class="position-fixed bottom-0 end-0 m-5">
 
-                    <button type="button" class="btn btn-primary btn-lg m-1" data-bs-toggle="modal"
-                        data-bs-target="#settingModal">
-                        <i class="bi bi-gear"></i>
-                    </button>
+                    <p>&nbsp&nbsp&nbsp&nbsp&nbsp</p>
+                    <div id="bottom_tool_function" class="row m-0 bg-primary rounded-2" style="width: fit-content;">
 
-                    <select id="page_select" class="form-select form-select-lg mb-1" aria-label="select page"
-                        onchange="selectPage(this.value, '1')">
-                        <!-- <option value="0" selected>0</option> -->
-                    </select>
-                </div>
-
-                <!-- 畫面中下方的回到頁面頂端和選擇頁面下拉選單 -->
-                <div id="midFlyArea"
-                    class="position-fixed bottom-0 start-50 translate-middle-x m-5 w-50 d-flex justify-content-center">
-
-                    <p></p>
-                    <div id="midFlyFunction" class="row m-0 bg-primary rounded-2"
-                        style="width: fit-content;display: none;">
-                        <button class="col-1 btn btn-primary btn-lg m-2 " onclick="topFunction()" id="btn_top">
+                        <!-- 回到頁面頂端 -->
+                        <button class="col btn btn-primary btn-lg m-2 " onclick="topFunction()">
                             <span class="bi bi-airplane-fill"></span>
                         </button>
+
+                        <!-- 開啟設定選單 -->
+                        <button class="col btn btn-primary btn-lg m-1" data-bs-toggle="modal"
+                            data-bs-target="#settingModal">
+                            <i class="bi bi-gear-fill"></i>
+                        </button>
+
+                        <!-- 選擇頁面下拉選單 -->
                         <div class="col-md-auto p-2">
                             <select id="midPageSelect" class="form-select form-select-lg" aria-label="select page"
                                 onchange="selectControlsPage(this.value)">
                             </select>
                         </div>
+
+                        <!-- 隱藏工具列 -->
+                        <button class="col btn btn-primary btn-lg m-1" id="btn_hide_tool">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
                     </div>
 
                 </div>
@@ -396,14 +381,14 @@
             pageModeNow = mode;
 
             if (mode == 0) {
-                tunckShift(0);
+                trunckShift(0);
                 OnePicShift(0);
                 branchShift(0);
                 clipShift(0);
             }
 
             if (mode == 1) {
-                tunckShift(0);
+                trunckShift(0);
                 OnePicShift(1);
                 branchShift(0);
                 clipShift(0);
@@ -412,14 +397,14 @@
 
             if (mode == 2) {
                 OnePicShift(0);
-                tunckShift(1);
+                trunckShift(1);
                 branchShift(1);
                 clipShift(0);
             }
 
 
             if (mode == 3) {
-                tunckShift(1);
+                trunckShift(1);
                 OnePicShift(0);
                 branchShift(0);
                 clipShift(1);
@@ -427,15 +412,15 @@
 
 
 
-            function tunckShift(status = 0) {
+            function trunckShift(status = 0) {
 
                 if (status == 0) {
 
                     // 區域1 滿版
                     $('#div_trunk').removeClass('col-6').addClass('col-12');
 
-                    // 區域1 ✈️到右下
-                    $('#flyPage').removeClass('start-0').addClass('end-0');
+                    // 區域1工具 ✈️到右下
+                    $('#bottom_tool_area').removeClass('start-0').addClass('end-0');
 
                     // 區域1圖片 移除卷軸
                     $('#div_imgs').removeClass('scrollImageDiv');
@@ -449,7 +434,7 @@
                     $('#div_trunk').removeClass('col-12').addClass('col-6');
 
                     // 區域1 ✈️到左下
-                    $('#flyPage').removeClass('end-0').addClass('start-0');
+                    $('#bottom_tool_area').removeClass('end-0').addClass('start-0');
 
                     // 區域1圖片 加入卷軸
                     $('#div_imgs').addClass('scrollImageDiv');
@@ -462,8 +447,10 @@
 
                     // 區域1 顯示
                     $('#div_imgs').show();
-                    // 區域1 ✈️ 顯示
-                    $('#flyPage').show();
+                    // 區域1 工具 移到右下               
+                    $('#bottom_tool_area').removeClass('start-50 translate-middle-x w-50 d-flex justify-content-center').addClass('end-0');
+
+
                     // 輪播 隱藏
                     $('#div_carousel_area').hide();
 
@@ -478,8 +465,9 @@
                     // 區域1 隱藏
                     $('#div_imgs').hide();
 
-                    // 區域1 ✈️ 隱藏
-                    $('#flyPage').hide();
+                    // 區域1 工具 移到中間
+                    $('#bottom_tool_area').removeClass('end-0').addClass('start-50 translate-middle-x w-50 d-flex justify-content-center');
+
 
                     // 輪播 顯示
                     $('#div_carousel_area').show();
@@ -1209,53 +1197,40 @@
             }
         });
 
-        // 顯示中下方頁碼選取
-        // 只在單一圖片模式下啟用
-        $('#midFlyArea').on('mouseover', function () {
 
-            if (!$('#OnePicSwitch').prop('checked')) return;
 
-            var display = $("#midFlyFunction").css("display") === "none" ? false : true;
+        // 隱藏下方工具列
+        let toolIsClosing = false;
+
+        $('#btn_hide_tool').on('click', function () {
+
+            $('#bottom_tool_function').toggle();
+
+            toolIsClosing = true;
+
+            setTimeout(() => {
+                toolIsClosing = false;
+            }, 2000);
+
+        });
+
+
+        // 顯示下方工具列
+        $('#bottom_tool_area').on('mouseover', function () {
+
+            if (toolIsClosing) return;
+
+
+            console.log('mouseover');
+
+            var display = $("#bottom_tool_function").css("display") === "none" ? false : true;
 
             if (!display) {
-                $('#midFlyFunction').toggle();
+                $('#bottom_tool_function').toggle();
             }
 
         });
 
-        // 隱藏中下方頁碼選取
-        $('#midFlyArea').on('mouseout', function () {
-
-
-            if (!$('#OnePicSwitch').prop('checked')) return;
-
-            clearTimeout(this.setTimeout);
-
-            this.setTimeout = setTimeout(function () {
-
-                var display = $("#midFlyFunction").css("display") === "none" ? false : true;
-
-                if (display) {
-                    $('#midFlyFunction').toggle();
-                }
-
-            }, 6000);
-
-        });
-
-        // 顯示中下方頁碼選取
-        $('#midFlyFunction').on('mouseover', function () {
-
-
-            if (!$('#OnePicSwitch').prop('checked')) return;
-
-            var display = $("#midFlyFunction").css("display") === "none" ? false : true;
-
-            if (!display) {
-
-                $('#midFlyFunction').toggle();
-            }
-        });
 
 
         // 對比度調整
