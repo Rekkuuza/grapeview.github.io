@@ -45,6 +45,12 @@
                 </div>
                 <div class="modal-body">
                     <div>
+                        <label for="imageSizeRange" class="form-label">IMAGE SIZE </label>
+                        <label id="imageSizeRangeValue" class="form-label">100%</label>
+                        <button id="btn_resetImageSize" class="btn btn-light">⮌</button>
+                        <input type="range" class="form-range" min="0" max="400" id="imageSizeRange" value="100">
+                    </div>
+                    <div>
                         <label for="contrastRange" class="form-label">CONTRAST </label>
                         <label id="contrastRangeValue" class="form-label">100%</label>
                         <button id="btn_resetContrast" class="btn btn-light">⮌</button>
@@ -1239,6 +1245,26 @@
             }
 
         });
+
+        // 圖片大小調整
+
+        $('#imageSizeRange').change(function () {
+
+            var newValue = this.value;
+            $('#imageSizeRangeValue').html(newValue + '%');
+
+            $('img').css('width', newValue + '%');
+        });
+
+        $('#btn_resetImageSize').click(function () {
+            defaultImageSize();
+        });
+
+        function defaultImageSize() {
+            $('#imageSizeRange').val(100);
+            $('#imageSizeRangeValue').html('100%');
+            $('img').css('width', '100%');
+        }
 
 
 
