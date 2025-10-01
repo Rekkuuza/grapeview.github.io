@@ -86,6 +86,12 @@
                     <label class="form-check-label text-light h5" for="OnePicSwitch">One Pic Mode</label>
 
                 </div>
+
+                <!-- <div class="form-check form-switch ms-2">
+                    <input class="form-check-input h5" type="checkbox" id="editSwitch" onchange="setPageMode(3)">
+                    <label class="form-check-label text-light h5" for="editSwitch">Edit Mode</label>
+
+                </div> -->
             </div>
         </div>
 
@@ -320,7 +326,7 @@
                     </select>
                 </div>
             </div> <!-- div_branch -->
-            <div id="div_clip" class="col-0" style="display: none;">
+            <div id="div_edit" class="col-0" style="display: none;">
                 <div> <br />
                     <br />
                     <br />
@@ -338,6 +344,7 @@
                     <br />
                 </div>
                 <div style="height:100vh;overflow-y:scroll;">
+                    <div id="div_edit_content"></div>
                     <dl id="dl_clip">
                         <!-- <dt>Coffee</dt>
                     <dd>- black hot drink</dd>
@@ -367,7 +374,7 @@
         /**
          * 頁面模式切換 
          * 
-         * @param mode - 0=單區域模式 1=單頁模式 2=雙區域模式  3=clip模式
+         * @param mode - 0=單區域模式 1=單頁模式 2=雙區域模式  3=編輯模式
         */
         function setPageMode(mode) {
 
@@ -409,6 +416,8 @@
                 branchShift(0);
                 clipShift(1);
             }
+
+
 
 
 
@@ -517,10 +526,10 @@
                 if (status == 0) {
 
                     // ocr區 隱藏
-                    $('#div_clip').hide();
+                    $('#div_edit').hide();
 
                     // ocr區 寬度0
-                    $('#div_clip').removeClass('col-6').addClass('col-0');
+                    $('#div_edit').removeClass('col-6').addClass('col-0');
 
                     $('.a1-image').show();
                     $('.a1-canvas').hide();
@@ -529,10 +538,10 @@
                 if (status == 1) {
 
                     // ocr區 顯示
-                    $('#div_clip').show();
+                    $('#div_edit').show();
 
                     // ocr區 半版
-                    $('#div_clip').removeClass('col-0').addClass('col-6');
+                    $('#div_edit').removeClass('col-0').addClass('col-6');
 
                     // 切換到寬螢幕模式
                     if (!$('#wideSwitch').prop('checked')) {
