@@ -30,6 +30,13 @@
         height: 100vh;
         transition-duration: 0s;
     }
+
+    .carousel-caption {
+        top: 98%;
+        /* transform: translateY(-50%);
+        bottom: initial; */
+        /* Override Bootstrap's default bottom positioning */
+    }
 </style>
 
 <body class="bg-dark">
@@ -46,9 +53,9 @@
                 <div class="modal-body">
                     <div>
                         <label for="imageSizeRange" class="form-label">IMAGE SIZE </label>
-                        <label id="imageSizeRangeValue" class="form-label">100%</label>
+                        <label id="imageSizeRangeValue" class="form-label">0</label>
                         <button id="btn_resetImageSize" class="btn btn-light">⮌</button>
-                        <input type="range" class="form-range" min="0" max="400" id="imageSizeRange" value="100">
+                        <input type="range" class="form-range" min="-1000" max="1000" id="imageSizeRange" value="0">
                     </div>
                     <div>
                         <label for="contrastRange" class="form-label">CONTRAST </label>
@@ -188,7 +195,7 @@
 
 
                 <!-- 圖片區1 -->
-                <div id="div_imgs" style="height:100vh;text-align: center;"></div>
+                <div id="div_imgs" class="d-flex flex-column align-items-center" style="height:100vh;"></div>
 
 
 
@@ -376,6 +383,7 @@
         const supportVideoFormats = ['.mp3', '.flac', '.mp4', '.webm', '.ogg', '.mkv', '.avi', '.mov', '.flv', '.wmv'];
         let tempImgFilesArea1 = []; // 用於存儲圖片檔案的陣列
         let pageModeNow = 0; // 頁面現在模式
+        let timeOutList = []; // 用於存儲 setTimeout 的 ID
 
         /**
          * 頁面模式切換 
@@ -461,7 +469,7 @@
                 if (status == 0) {
 
                     // 區域1 顯示
-                    $('#div_imgs').show();
+                    $('#div_imgs').addClass("d-flex").removeClass("d-none");
                     // 區域1 工具 移到右下               
                     $('#bottom_tool_area').removeClass('start-50 translate-middle-x w-50 d-flex justify-content-center').addClass('end-0');
 
@@ -477,8 +485,11 @@
 
                 if (status == 1) {
 
+                    console.log('OnePicShift: 單頁模式');
+
                     // 區域1 隱藏
-                    $('#div_imgs').hide();
+                    $('#div_imgs').removeClass("d-flex").addClass("d-none");
+
 
                     // 區域1 工具 移到中間
                     $('#bottom_tool_area').removeClass('end-0').addClass('start-50 translate-middle-x w-50 d-flex justify-content-center');
@@ -704,6 +715,19 @@
                             let _img = {};
                             _img.imgSrc = imgSrc;
                             _img.name = name;
+                            _img.frameDuration = [];
+
+
+                            if (name.toLowerCase().endsWith('webp')) {
+
+                                _img.frameDuration = await getWebpFrameDurations(_file);
+                            }
+
+                            if (name.toLowerCase().endsWith('gif')) {
+
+                                _img.frameDuration = await getGifFrameDurations(_file);
+                            }
+
 
                             imgFiles.push(_img);
                         }
@@ -714,23 +738,23 @@
 
                     if (handle.name.endsWith('.zip')) {
 
-                        let file = await handle.getFile();
-                        UnZipAndShowImg(file, area);
+                        let _file = await handle.getFile();
+                        UnZipAndShowImg(_file, area);
                         return;
 
                     }
                     if (handle.name.endsWith('.pdf')) {
 
-                        let file = await handle.getFile();
-                        openPdfFile(file, area);
+                        let _file = await handle.getFile();
+                        openPdfFile(_file, area);
                         return;
 
                     }
 
                     if (supportVideoFormats.some(fileExtension => handle.name.toLowerCase().endsWith(fileExtension))) {
 
-                        let file = await handle.getFile();
-                        let videoSrc = URL.createObjectURL(file);
+                        let _file = await handle.getFile();
+                        let videoSrc = URL.createObjectURL(_file);
                         $('#video_player').attr('src', videoSrc);
                         $('#div_video').removeAttr('hidden');
                         return;
@@ -738,13 +762,24 @@
                     }
                     else {
 
-
-                        let file = await handle.getFile();
-                        let imgSrc = URL.createObjectURL(file);
+                        let _file = await handle.getFile();
+                        let imgSrc = URL.createObjectURL(_file);
 
                         let _img = {};
                         _img.imgSrc = imgSrc;
-                        _img.name = file.name;
+                        _img.name = _file.name;
+                        _img.frameDuration = [];
+
+                        if (_file.name.toLowerCase().endsWith('webp')) {
+
+                            _img.frameDuration = await getWebpFrameDurations(_file);
+                        }
+
+                        if (_file.name.toLowerCase().endsWith('gif')) {
+
+                            _img.frameDuration = await getGifFrameDurations(_file);
+                        }
+
                         imgFiles.push(_img);
 
                     }
@@ -755,7 +790,74 @@
         }
 
 
+        // 取得 webp 動畫每一幀的時間
+        function getWebpFrameDurations(file) {
 
+            return new Promise(async (resolve) => {
+
+                const buffer = await file.arrayBuffer();
+                const dataView = new DataView(buffer);
+                let pos = 12;
+                const durations = [];
+
+
+                while (pos < buffer.byteLength) {
+                    const chunkHeader = String.fromCharCode(
+                        dataView.getUint8(pos),
+                        dataView.getUint8(pos + 1),
+                        dataView.getUint8(pos + 2),
+                        dataView.getUint8(pos + 3)
+                    );
+                    const chunkSize = dataView.getUint32(pos + 4, true);
+
+                    if (chunkHeader === "ANMF") {
+                        const _time = dataView.getUint16(pos + 20, true);
+                        durations.push(_time);
+                    }
+
+                    // 每個 chunk 往下移動 (對齊到偶數)
+                    pos += 8 + chunkSize + (chunkSize % 2);
+                }
+
+                resolve(durations);
+            });
+        }
+
+        // 取得 gif 動畫每一幀的時間
+        function getGifFrameDurations(file) {
+
+            return new Promise(async (resolve) => {
+
+
+                let durations = [];
+
+
+                const buffer = await file.arrayBuffer();
+                const dataView = new DataView(buffer);
+
+
+                let pos = 0;
+
+                while (pos < buffer.byteLength) {
+                    // 找到 Graphics Control Extension 標記: 21 F9 04  
+                    if (
+                        dataView.getUint8(pos) === 0x21 &&
+                        dataView.getUint8(pos + 1) === 0xf9 &&
+                        dataView.getUint8(pos + 2) === 0x04 &&
+                        dataView.getUint8(pos + 7) === 0x00
+                    ) {
+
+                        // Delay Time 在 offset +4 (2 bytes, little-endian)，單位 1/100 秒
+                        const delay = dataView.getUint16(pos + 4, true);
+
+                        durations.push(delay * 10); // 轉換為毫秒
+                    }
+                    pos++;
+                }
+
+                resolve(durations);
+            });
+        }
 
 
 
@@ -810,6 +912,7 @@
                         let _img = {};
                         _img.imgSrc = imgSrc;
                         _img.name = name;
+                        _img.frameDuration = [];
 
                         imgFiles.push(_img);
                     }
@@ -879,6 +982,18 @@
                         var _img = {};
                         _img.imgSrc = imgSrc;
                         _img.name = _filename;
+                        _img.frameDuration = [];
+
+                        if (_filename.toLowerCase().endsWith('webp')) {
+
+                            _img.frameDuration = await getWebpFrameDurations(blob);
+                        }
+
+                        if (_filename.toLowerCase().endsWith('gif')) {
+
+                            _img.frameDuration = await getGifFrameDurations(blob);
+                        }
+
 
                         imgFiles.push(_img);
                     }
@@ -961,6 +1076,14 @@
 
             // 重置亮度
             defaultBrightness();
+
+            // 清空所有 setTimeout
+            timeOutList.forEach((id) => clearTimeout(id));
+
+            // 還原圖片調整
+            defaultImageSize();
+            defaultBrightness();
+            defaultContrast();
         }
 
 
@@ -992,9 +1115,9 @@
 
 
             // 加載圖片
-            imgFiles.forEach((fr) => {
+            imgFiles.forEach((imgFile, index) => {
 
-                appendImg(fr.name, fr.imgSrc, area);
+                appendImg(imgFile, area, index);
             });
 
             // 加載輪播
@@ -1012,12 +1135,13 @@
 
 
         // 將圖片加入圖片區
-        function appendImg(name, imgSrc, area = '1') {
+        async function appendImg(imgFile, area = '1', index = 0) {
 
 
             let div_imgs = '#div_imgs';
             let page_select = '#page_select';
-
+            var name = imgFile.name;
+            var imgSrc = imgFile.imgSrc;
 
             if (area == '2') {
 
@@ -1028,13 +1152,26 @@
 
             const img = document.createElement('img');
             img.src = imgSrc;
-            img.className = 'img-fluid a1-image';
-            img.onload = drawImageActualSize;
+            img.style.cssText = 'height:auto;';
+            img.className = 'a1-image mb-0';
+            let _imgid = 'area_' + area + '_img_' + name;
+            img.setAttribute("id", _imgid);
 
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext("2d");
-            canvas.className = 'a1-canvas';
-            canvas.style.cssText = 'display:none';
+            const figure = document.createElement('figure');
+            figure.style.cssText = 'height:auto;';
+            figure.className = 'p-0 m-0';
+            figure.append(img);
+
+
+            const figureCaption = document.createElement('figcaption');
+            figureCaption.className = 'figure-caption';
+            figure.append(figureCaption);
+
+            //  img.onload = drawImageActualSize;
+            // const canvas = document.createElement('canvas');
+            // const ctx = canvas.getContext("2d");
+            // canvas.className = 'a1-canvas';
+            // canvas.style.cssText = 'display:none';
 
             const p = document.createElement('p');
             let _pid = 'area_' + area + name;
@@ -1042,8 +1179,25 @@
             p.setAttribute("id", _pid);
 
             $(div_imgs).append(p);
-            $(div_imgs).append(img);
-            $(div_imgs).append(canvas);
+            $(div_imgs).append(figure);
+            //  $(div_imgs).append(canvas);
+
+
+
+            if (imgFile.frameDuration.length > 0) {
+
+                const progress = document.createElement('progress');
+                progress.value = 0;
+                progress.max = imgFile.frameDuration.length;
+                progress.className = 'w-100';
+                let _progressId = 'progress_' + _imgid;
+                progress.setAttribute("id", _progressId);
+                figureCaption.append(progress);
+
+
+                progressRun(imgFile.frameDuration, 0, _progressId);
+            }
+
             $(div_imgs).append('<br>');
 
             const option = document.createElement('option');
@@ -1124,12 +1278,43 @@
                 canvas.addEventListener('mouseout', e => {
                     isDrawing = false;
                     ctx.drawImage(orign_image, 0, 0, canvas.width, canvas.height);
-
                 });
             }
 
         }
 
+
+        // 動畫圖片進度條
+        function progressRun(delayFrames, index, id) {
+
+            let progress = document.getElementById(id);
+
+            let delayTime = delayFrames[index];
+
+
+            progress.value = index;
+
+            if (index > delayFrames.length) {
+
+                progress.value = 0;
+
+
+                let _img = document.getElementById(id.replace('progress_', ''));
+
+                _img.src = _img.src;
+
+                var timeOutId = setTimeout(() => progressRun(delayFrames, 0, id), delayTime);
+                timeOutList.push(timeOutId);
+
+                return;
+            }
+
+            index += 1;
+
+            var timeOutId = setTimeout(() => progressRun(delayFrames, index, id), delayTime);
+            timeOutList.push(timeOutId);
+
+        }
 
 
 
@@ -1147,12 +1332,35 @@
                 carouselItem.className = 'carousel-item' + (index === 0 ? ' active' : '');
                 carouselItem.className += ' carouselItem';
 
+
+
                 const img = document.createElement('img');
                 img.src = fr.imgSrc;
                 img.className = 'img-fit';
                 img.alt = fr.name;
+                let _imgid = 'carousel_' + 'img_' + fr.name;
+                img.setAttribute("id", _imgid);
+                carouselItem.append(img);
 
-                carouselItem.appendChild(img);
+                if (fr.frameDuration.length > 0) {
+
+                    const carouselCaption = document.createElement('div');
+                    carouselCaption.className = 'carousel-caption p-0 m-0';
+
+                    const progress = document.createElement('progress');
+                    progress.value = 0;
+                    progress.max = fr.frameDuration.length;
+                    progress.className = 'w-100';
+                    let _progressId = 'progress_' + _imgid;
+                    progress.setAttribute("id", _progressId);
+
+                    carouselCaption.append(progress);
+                    carouselItem.append(carouselCaption);
+
+                    setTimeout(() => progressRun(fr.frameDuration, 0, _progressId), 1000);
+                }
+
+
                 document.getElementById('carouselInner').appendChild(carouselItem);
                 $('#midPageSelect').append($('<option>', { value: fr.name, text: fr.name }));
 
@@ -1182,12 +1390,7 @@
 
         function selectControlsPage(name) {
 
-            console.log(name);
-
-
             var pageNumber = tempImgFilesArea1.map(file => file.name).indexOf(name);
-
-            console.log(pageNumber);
 
             // 更新輪播到選擇的頁面
             $('#carouselControls').carousel(pageNumber);
@@ -1236,7 +1439,7 @@
             if (toolIsClosing) return;
 
 
-            console.log('mouseover');
+            // console.log('mouseover');
 
             var display = $("#bottom_tool_function").css("display") === "none" ? false : true;
 
@@ -1246,14 +1449,28 @@
 
         });
 
-        // 圖片大小調整
 
+        let lastSize = 0;
+
+        // 圖片大小調整
         $('#imageSizeRange').change(function () {
 
-            var newValue = this.value;
-            $('#imageSizeRangeValue').html(newValue + '%');
+            var newSize = this.value;
+            var sizeChange = newSize - lastSize;
 
-            $('img').css('width', newValue + '%');
+
+            $('img').each(function () {
+
+                var _widthNow = $(this).width();
+
+                var _newWidth = _widthNow + sizeChange;
+
+                $(this).css('width', _newWidth + 'px');
+            });
+
+            lastSize = newSize;
+            $('#imageSizeRangeValue').html('+' + newSize + 'px');
+
         });
 
         $('#btn_resetImageSize').click(function () {
@@ -1261,9 +1478,21 @@
         });
 
         function defaultImageSize() {
-            $('#imageSizeRange').val(100);
-            $('#imageSizeRangeValue').html('100%');
-            $('img').css('width', '100%');
+
+
+            var sizeChange = 0 - lastSize;
+            $('img').each(function () {
+
+                var _widthNow = $(this).width();
+
+                var _newWidth = _widthNow + sizeChange;
+
+                $(this).css('width', _newWidth + 'px');
+            });
+
+            lastSize = 0;
+            $('#imageSizeRange').val(0);
+            $('#imageSizeRangeValue').html('0');
         }
 
 
