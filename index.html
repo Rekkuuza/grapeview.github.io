@@ -41,7 +41,7 @@
 
 <body class="bg-dark">
 
-    <!-- 互動視窗 調整圖片遮罩 Modal -->
+    <!-- 互動視窗 調整圖片設定(大小對比) Modal -->
     <div class="modal" id="settingModal" tabindex="-1" aria-labelledby="settingModalLabel" aria-hidden="true"
         data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -69,6 +69,13 @@
                         <button id="btn_resetBrightness" class="btn btn-light">⮌</button>
                         <input type="range" class="form-range" min="0" max="400" id="brightnessRange" value="100">
 
+                    </div>
+                    <div>
+                        <label for="brightnessRange" class="form-label">SHOW IMAGE NAME</label>
+                        <div class="form-check form-switch ms-2">
+                            <input class="form-check-input" type="checkbox" id="showImageSwitch"
+                                onchange="showImageName()">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1177,6 +1184,7 @@
             let _pid = 'area_' + area + name;
             p.innerHTML = name;
             p.setAttribute("id", _pid);
+            p.className = 'image_name';
 
             $(div_imgs).append(p);
             $(div_imgs).append(figure);
@@ -1533,6 +1541,17 @@
             $('#brightnessRange').val(100);
             $('#brightnessRangeValue').html('100%');
             $('img').css('filter', 'brightness(100%)');
+        }
+        // 顯示/隱藏圖片名稱
+        function showImageName() {
+
+            if ($('#showImageSwitch').prop('checked')) {
+
+                $('.image_name').addClass('text-light');
+            } else {
+
+                $('.image_name').removeClass('text-light');
+            }
         }
     </script>
 </body>
