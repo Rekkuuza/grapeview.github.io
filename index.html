@@ -82,6 +82,25 @@
         </div>
     </div>
 
+    <div class="modal" id="bookmarkModal" tabindex="-1" aria-labelledby="bookmarkModalLabel" aria-hidden="true"
+        data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bookmarkModalLabel">BOOKMARK</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="list-group" id="bookmarkList">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 
 
@@ -255,6 +274,13 @@
                             <i class="bi bi-gear-fill"></i>
                         </button>
 
+                        <!-- 開啟書籤選單 -->
+                        <button class="col btn btn-primary btn-lg m-1" data-bs-toggle="modal"
+                            data-bs-target="#bookmarkModal">
+                            <i class="bi bi-journal-bookmark-fill"></i>
+                        </button>
+
+
                         <!-- 選擇頁面下拉選單 -->
                         <div class="col-md-auto p-2">
                             <select id="midPageSelect" class="form-select form-select-lg" aria-label="select page"
@@ -391,6 +417,7 @@
         let tempImgFilesArea1 = []; // 用於存儲圖片檔案的陣列
         let pageModeNow = 0; // 頁面現在模式
         let timeOutList = []; // 用於存儲 setTimeout 的 ID
+        let bookmarkList = []; // 書籤清單
 
         /**
          * 頁面模式切換 
@@ -1058,7 +1085,7 @@
         function beforeLoad(fileName = '', area = '1') {
 
             let div_imgs = '#div_imgs';
-            let page_select = '#page_select';
+            let page_select = '#midPageSelect';
             let p_title = '#p_title';
 
             if (area == '2') {
@@ -1096,7 +1123,7 @@
 
 
         // 加載圖片
-        function loadImages(fileName, imgFiles, area = '1') {
+        function loadImages(fileName, imgFiles, area = '1', fromBookmark = false) {
 
 
             if (!imgFiles || imgFiles.length === 0) return;
@@ -1109,6 +1136,19 @@
             // 暫存圖片
             if (area == '1') tempImgFilesArea1 = imgFiles;
             else if (area == '2') tempImgFilesArea2 = imgFiles;
+
+            if (!fromBookmark) {
+
+                // 更新書籤清單 
+                let bookmark = {
+                    fileName: fileName,
+                    imgFiles: imgFiles
+                };
+
+                bookmarkList.push(bookmark);
+                updateBookmarkList();
+            }
+
 
             // 圖片排序
             imgFiles.sort((a, b) => {
@@ -1181,7 +1221,7 @@
             // canvas.style.cssText = 'display:none';
 
             const p = document.createElement('p');
-            let _pid = 'area_' + area + name;
+            let _pid = 'area_' + area + '_' + name;
             p.innerHTML = name;
             p.setAttribute("id", _pid);
             p.className = 'image_name';
@@ -1398,6 +1438,14 @@
 
         function selectControlsPage(name) {
 
+            let titleName = 'area_1_' + name;
+
+            document.getElementById(titleName).scrollIntoView({
+                behavior: "instant",  // smooth, instant, auto
+                block: "start",      // 將元素的哪個部分對齊到可視區域（start, center, end, nearest）
+            });
+
+
             var pageNumber = tempImgFilesArea1.map(file => file.name).indexOf(name);
 
             // 更新輪播到選擇的頁面
@@ -1553,6 +1601,38 @@
                 $('.image_name').removeClass('text-light');
             }
         }
+
+        // 更新書籤清單
+        function updateBookmarkList() {
+            $('#bookmarkList').empty();
+
+            bookmarkList.forEach(function (bookmark, index) {
+
+                let _btn = document.createElement('button');
+                _btn.className = 'list-group-item list-group-item-action';
+                _btn.innerHTML = bookmark.fileName;
+                _btn.setAttribute('data-bs-dismiss', 'modal');
+                _btn.onclick = function () { openBookmark(bookmark.fileName); };
+
+
+                $('#bookmarkList').append(_btn);
+            });
+        }
+
+
+        function openBookmark(fileName) {
+
+            bookmarkList.forEach(function (bookmark) {
+
+                if (bookmark.fileName === fileName) {
+
+                    loadImages(bookmark.fileName, bookmark.imgFiles, '1', fromBookmark = true);
+                    topFunction();
+                    return;
+                }
+            });
+        };
+
     </script>
 </body>
 
