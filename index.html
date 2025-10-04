@@ -414,7 +414,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
         crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@zip.js/zip.js@2.8.7/dist/zip.min.js"></script>
 
 
     <script type="text/javascript">
@@ -742,7 +742,7 @@
 
                     fileName = handle.name;
 
-                    $('#loading_text').text('⌛NOW LOADING......' + fileName);
+                    $('#loading_text').text('⌛ NOW LOADING......' + fileName);
 
 
                     for await (const [name, _handle] of handle.entries()) {
@@ -1000,68 +1000,58 @@
         }
 
         // 解壓縮並顯示圖片
-        function UnZipAndShowImg(file, area = '1') {
+        async function UnZipAndShowImg(file, area = '1') {
 
-            const setImageArrayPromise = new Promise(async (resolve, reject) => {
-
-                var imgFiles = [];
-
-                var new_zip = new JSZip();
-
-                try {
-                    // 讀取壓縮檔
-                    var zip = await new_zip.loadAsync(file);
-
-                    for (const filename of Object.keys(zip.files)) {
-
-                        const fileData = zip.files[filename];
-
-                        if (!fileData.dir && supportImageFormats.some(ext => filename.toLowerCase().endsWith(ext))) {
+            var imgFiles = [];
 
 
-                            const blob = await fileData.async('blob');
-                            const imgSrc = URL.createObjectURL(blob);
+            const zipFileReader = new zip.BlobReader(file);
+
+            const zipReader = new zip.ZipReader(zipFileReader);
+
+            let entries = await zipReader.getEntries();
+
+            let count = 0;
+
+            for (var entry of entries) {
+
+                if (supportImageFormats.some(ext => entry.filename.toLowerCase().endsWith(ext))) {
 
 
+                    var _filename = entry.filename.substring(entry.filename.indexOf('/') + 1, entry.filename.length);
 
-                            var _filename = filename.substring(filename.indexOf('/') + 1, filename.length);
+                    const blobWriter = new zip.BlobWriter(zip.getMimeType(entry.filename));
 
-                            var _img = {};
-                            _img.imgSrc = imgSrc;
-                            _img.name = _filename;
-                            _img.frameDuration = [];
+                    const imageBlob = await entry.getData(blobWriter);
 
-                            if (_filename.toLowerCase().endsWith('webp')) {
+                    const imgSrc = URL.createObjectURL(imageBlob);
 
-                                _img.frameDuration = await getWebpFrameDurations(blob);
-                            }
+                    console.log(imgSrc);
 
-                            if (_filename.toLowerCase().endsWith('gif')) {
+                    var _img = {};
+                    _img.imgSrc = imgSrc;
+                    _img.name = _filename;
+                    _img.frameDuration = [];
 
-                                _img.frameDuration = await getGifFrameDurations(blob);
-                            }
+                    if (_filename.toLowerCase().endsWith('webp')) {
 
+                        _img.frameDuration = await getWebpFrameDurations(imageBlob);
+                    }
 
-                            imgFiles.push(_img);
-                        }
-                    };
-                    resolve(imgFiles);
+                    if (_filename.toLowerCase().endsWith('gif')) {
 
-                } catch (error) {
+                        _img.frameDuration = await getGifFrameDurations(imageBlob);
+                    }
 
-                    reject(error);
-                    return;
+                    imgFiles.push(_img);
                 }
+                count += 1;
 
-            });
+                $('#loading_text').text('⌛ NOW LOADING......' + file.name + ' ' + count + '//' + entries.length);
+            }
 
-            setImageArrayPromise.then((imgFiles) => {
 
-                loadImages(file.name, imgFiles, area);
-            }).catch((error) => {
-
-                $('#loading_text').text(file.name + '❌Error: ' + error.message);
-            });
+            loadImages(file.name, imgFiles, area);
         }
 
         async function showPdfFilePicker(area = '1') {
