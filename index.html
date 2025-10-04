@@ -1002,6 +1002,7 @@
         // 解壓縮並顯示圖片
         async function UnZipAndShowImg(file, area = '1') {
 
+            beforeLoad('', area);
             var imgFiles = [];
 
 
@@ -1042,6 +1043,9 @@
 
                         _img.frameDuration = await getGifFrameDurations(imageBlob);
                     }
+
+                    // 預先載入
+                    appendImg(_img, area)
 
                     imgFiles.push(_img);
                 }
