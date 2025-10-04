@@ -1060,7 +1060,7 @@
                 loadImages(file.name, imgFiles, area);
             }).catch((error) => {
 
-                $('#loading_text').text('❌Error: ' + error.message);
+                $('#loading_text').text(file.name + '❌Error: ' + error.message);
             });
         }
 
