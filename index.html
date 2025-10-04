@@ -1000,57 +1000,67 @@
         }
 
         // 解壓縮並顯示圖片
-        async function UnZipAndShowImg(file, area = '1') {
+        function UnZipAndShowImg(file, area = '1') {
 
-            const setImageArrayPromise = new Promise(async (resolve) => {
+            const setImageArrayPromise = new Promise(async (resolve, reject) => {
 
                 var imgFiles = [];
 
                 var new_zip = new JSZip();
 
-                // 讀取壓縮檔
-                var zip = await new_zip.loadAsync(file);
+                try {
+                    // 讀取壓縮檔
+                    var zip = await new_zip.loadAsync(file);
 
-                for (const filename of Object.keys(zip.files)) {
+                    for (const filename of Object.keys(zip.files)) {
 
-                    const fileData = zip.files[filename];
+                        const fileData = zip.files[filename];
 
-                    if (!fileData.dir && supportImageFormats.some(ext => filename.toLowerCase().endsWith(ext))) {
-
-
-                        const blob = await fileData.async('blob');
-                        const imgSrc = URL.createObjectURL(blob);
+                        if (!fileData.dir && supportImageFormats.some(ext => filename.toLowerCase().endsWith(ext))) {
 
 
+                            const blob = await fileData.async('blob');
+                            const imgSrc = URL.createObjectURL(blob);
 
-                        var _filename = filename.substring(filename.indexOf('/') + 1, filename.length);
 
-                        var _img = {};
-                        _img.imgSrc = imgSrc;
-                        _img.name = _filename;
-                        _img.frameDuration = [];
 
-                        if (_filename.toLowerCase().endsWith('webp')) {
+                            var _filename = filename.substring(filename.indexOf('/') + 1, filename.length);
 
-                            _img.frameDuration = await getWebpFrameDurations(blob);
+                            var _img = {};
+                            _img.imgSrc = imgSrc;
+                            _img.name = _filename;
+                            _img.frameDuration = [];
+
+                            if (_filename.toLowerCase().endsWith('webp')) {
+
+                                _img.frameDuration = await getWebpFrameDurations(blob);
+                            }
+
+                            if (_filename.toLowerCase().endsWith('gif')) {
+
+                                _img.frameDuration = await getGifFrameDurations(blob);
+                            }
+
+
+                            imgFiles.push(_img);
                         }
+                    };
+                    resolve(imgFiles);
 
-                        if (_filename.toLowerCase().endsWith('gif')) {
+                } catch (error) {
 
-                            _img.frameDuration = await getGifFrameDurations(blob);
-                        }
-
-
-                        imgFiles.push(_img);
-                    }
-                };
-                resolve(imgFiles);
+                    reject(error);
+                    return;
+                }
 
             });
 
             setImageArrayPromise.then((imgFiles) => {
 
                 loadImages(file.name, imgFiles, area);
+            }).catch((error) => {
+
+                $('#loading_text').text('❌Error: ' + error.message);
             });
         }
 
