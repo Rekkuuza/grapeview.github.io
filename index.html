@@ -82,6 +82,7 @@
         </div>
     </div>
 
+    <!-- 互動視窗 書籤 Modal -->
     <div class="modal" id="bookmarkModal" tabindex="-1" aria-labelledby="bookmarkModalLabel" aria-hidden="true"
         data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -211,11 +212,17 @@
                 </div> <!-- 功能區 -->
                 <br />
                 <br />
+                <!-- 讀取中 -->
+                <div>
+                    <p id="loading_text" class="text-light"></p>
+                </div>
                 <!-- 影片區域 -->
                 <div id="div_video" hidden>
                     <video id="video_player" autoplay controls>
                     </video>
                 </div>
+
+
                 <!-- 圖片標題1 -->
                 <p class="text-light" id="p_title"></p>
 
@@ -735,6 +742,8 @@
 
                     fileName = handle.name;
 
+                    $('#loading_text').text('⌛NOW LOADING......' + fileName);
+
 
                     for await (const [name, _handle] of handle.entries()) {
 
@@ -773,6 +782,9 @@
                     if (handle.name.endsWith('.zip')) {
 
                         let _file = await handle.getFile();
+
+                        $('#loading_text').text('⌛NOW LOADING...' + _file.name);
+
                         UnZipAndShowImg(_file, area);
                         return;
 
@@ -1178,6 +1190,8 @@
                 $('.a1-canvas').show();
 
             }
+
+            $('#loading_text').text('');
         }
 
 
