@@ -62,18 +62,38 @@
                         <input type="range" class="form-range" min="-1000" max="1000" id="imageSizeRange" value="0">
                     </div>
                     <div>
-                        <label for="contrastRange" class="form-label">CONTRAST </label>
+                        <label for="contrastRange" class="form-label" data-bs-toggle="tooltip" title="對比">CONTRAST
+                        </label>
                         <label id="contrastRangeValue" class="form-label">100%</label>
                         <button id="btn_resetContrast" class="btn btn-light">⮌</button>
                         <input type="range" class="form-range" min="0" max="400" id="contrastRange" value="100">
                     </div>
                     <div>
-                        <label for="brightnessRange" class="form-label">BRIGHTNESS </label>
+                        <label for="brightnessRange" class="form-label" data-bs-toggle="tooltip" title="亮度">BRIGHTNESS
+                        </label>
                         <label id="brightnessRangeValue" class="form-label">100%</label>
                         <button id="btn_resetBrightness" class="btn btn-light">⮌</button>
                         <input type="range" class="form-range" min="0" max="400" id="brightnessRange" value="100">
 
                     </div>
+                    <div>
+                        <label for="saturationRange" class="form-label" data-bs-toggle="tooltip" title="飽和度">SATURATION
+                        </label>
+                        <label id="saturationRangeValue" class="form-label">100%</label>
+                        <button id="btn_resetSaturation" class="btn btn-light">⮌</button>
+                        <input type="range" class="form-range" min="0" max="200" id="saturationRange" value="100">
+
+                    </div>
+                    <div>
+                        <label for="grayscaleRange" class="form-label" data-bs-toggle="tooltip" title="灰度">GRAYSCALE
+                        </label>
+                        <label id="grayscaleRangeValue" class="form-label">0%</label>
+                        <button id="btn_resetGrayscale" class="btn btn-light">⮌</button>
+                        <input type="range" class="form-range" min="0" max="100" id="grayscaleRange" value="0">
+
+                    </div>
+
+
                     <div>
                         <label for="brightnessRange" class="form-label">SHOW IMAGE NAME</label>
                         <div class="form-check form-switch ms-2">
@@ -1131,13 +1151,18 @@
             // 重置亮度
             defaultBrightness();
 
+            // 重置飽和度
+            defaultSaturation();
+
+            // 重置灰度
+            defaultGrayscale();
+
             // 清空所有 setTimeout
             timeOutList.forEach((id) => clearTimeout(id));
 
             // 還原圖片調整
             defaultImageSize();
-            defaultBrightness();
-            defaultContrast();
+
         }
 
 
@@ -1612,6 +1637,46 @@
             $('#brightnessRangeValue').html('100%');
             $('img').css('filter', 'brightness(100%)');
         }
+
+
+        // 飽和度調整
+        $('#saturationRange').change(function () {
+
+            var newValue = this.value;
+            $('#saturationRangeValue').html(newValue + '%');
+
+            $('img').css('filter', 'saturate(' + newValue + '%)');
+        });
+
+        $('#btn_resetSaturation').click(function () {
+            defaultSaturation();
+        });
+
+        function defaultSaturation() {
+            $('#saturationRange').val(100);
+            $('#saturationRangeValue').html('100%');
+            $('img').css('filter', 'saturate(100%)');
+        }
+
+        // 灰度調整
+        $('#grayscaleRange').change(function () {
+
+            var newValue = this.value;
+            $('#grayscaleRangeValue').html(newValue + '%');
+
+            $('img').css('filter', 'grayscale(' + newValue + '%)');
+        });
+
+        $('#btn_resetGrayscale').click(function () {
+            defaultGrayscale();
+        });
+
+        function defaultGrayscale() {
+            $('#grayscaleRange').val(0);
+            $('#grayscaleRangeValue').html('0%');
+            $('img').css('filter', 'grayscale(0%)');
+        }
+
         // 顯示/隱藏圖片名稱
         function showImageName() {
 
