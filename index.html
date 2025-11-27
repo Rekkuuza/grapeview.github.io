@@ -92,6 +92,35 @@
                         <input type="range" class="form-range" min="0" max="100" id="grayscaleRange" value="0">
 
                     </div>
+                    <div>
+                        <label class="form-label" data-bs-toggle="tooltip" title="混合圖層">MIX-BLEND-MODE</label>
+                        <div class="row">
+                            <input type="color" class="form-control form-control-color col" id="mixBlendColorPicker"
+                                value="#000000" title="Choose your color">
+                            <select id="mixBlendSelector" class="col">
+                                <option value="normal">normal</option>
+                                <option value="multiply">multiply</option>
+                                <option value="screen">screen</option>
+                                <option value="overlay">overlay</option>
+                                <option value="darken">darken</option>
+                                <option value="lighten">lighten</option>
+                                <option value="color-dodge">color-dodge</option>
+                                <option value="color-burn">color-burn</option>
+                                <option value="hard-light">hard-light</option>
+                                <option value="soft-light">soft-light</option>
+                                <option value="difference">difference</option>
+                                <option value="exclusion">exclusion</option>
+                                <option value="hue">hue</option>
+                                <option value="saturation">saturation</option>
+                                <option value="color">color</option>
+                                <option value="luminosity">luminosity</option>
+                                <option value="plus-darker">plus-darker</option>
+                                <option value="plus-lighter">plus-lighter</option>
+                            </select>
+                        </div>
+
+
+                    </div>
 
 
                     <div>
@@ -1676,6 +1705,21 @@
             $('#grayscaleRangeValue').html('0%');
             $('img').css('filter', 'grayscale(0%)');
         }
+
+        // 混合圖層顏色選擇
+        $('#mixBlendColorPicker').change(function () {
+
+            var newValue = this.value;
+
+            $('figure').css('background-color', newValue);
+        });
+
+        $('#mixBlendSelector').change(function () {
+
+            $('figure').css('background-color', $('#mixBlendColorPicker').val());
+
+            $('img').css('mix-blend-mode', this.value);
+        });
 
         // 顯示/隱藏圖片名稱
         function showImageName() {
