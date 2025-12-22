@@ -469,6 +469,9 @@
         crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@zip.js/zip.js@2.8.7/dist/zip.min.js"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
+    <script src="https://github.com/futurepress/epub.js/releases/download/v0.3.88/epub.min.js"></script>
+
 
     <script type="text/javascript">
 
@@ -850,6 +853,15 @@
 
                     }
 
+                    if (handle.name.endsWith('.epub')) {
+
+                        let _file = await handle.getFile();
+                        openEpubFile(_file, area);
+                        return;
+
+                    }
+
+
                     if (supportVideoFormats.some(fileExtension => handle.name.toLowerCase().endsWith(fileExtension))) {
 
                         let _file = await handle.getFile();
@@ -1080,7 +1092,7 @@
 
                     const imgSrc = URL.createObjectURL(imageBlob);
 
-                    console.log(imgSrc);
+                    // console.log(imgSrc);
 
                     var _img = {};
                     _img.imgSrc = imgSrc;
@@ -1147,6 +1159,57 @@
 
             beforeLoad('', area);
             $(div_imgs).append(embed);
+        }
+
+        async function openEpubFile(file, area = '1') {
+
+            const book = ePub(file);
+
+            await book.ready;
+
+            const zip = book.archive.zip;
+
+            const imageExtensions = /\.(png|jpe?g|gif|svg|webp)$/i;
+
+            var imgFiles = [];
+
+            let count = 0;
+
+            let _fileLength = Object.keys(zip.files).length;
+
+            for (const fileName of Object.keys(zip.files)) {
+                if (!imageExtensions.test(fileName)) continue;
+
+                const zipEntry = zip.files[fileName];
+                if (zipEntry.dir) continue;
+
+                // Get image as Base64
+                const base64 = await zipEntry.async("base64");
+
+                // Guess MIME type
+                const ext = fileName.split(".").pop().toLowerCase();
+                const mime = ext === "svg" ? "image/svg+xml" : `image/${ext === "jpg" ? "jpeg" : ext}`;
+
+                // Create img  
+                var imgSrc = `data:${mime};base64,${base64}`;
+
+                var _img = {};
+                _img.imgSrc = imgSrc;
+                _img.name = fileName;
+                _img.frameDuration = [];
+
+                // 預先載入
+                appendImg(_img, area)
+
+                imgFiles.push(_img);
+
+                count += 1;
+
+                $('#loading_text').text('⌛ NOW LOADING......' + file.name + ' ' + count + '/' + _fileLength);
+
+            }
+
+            loadImages(file.name, imgFiles, area);
         }
 
 
