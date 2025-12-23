@@ -811,11 +811,7 @@
                             let imgSrc = URL.createObjectURL(_file);
 
 
-                            let _img = {};
-                            _img.imgSrc = imgSrc;
-                            _img.name = name;
-                            _img.frameDuration = [];
-
+                            let _img = new ImageModel(imgSrc, name);
 
                             if (name.toLowerCase().endsWith('webp')) {
 
@@ -876,10 +872,7 @@
                         let _file = await handle.getFile();
                         let imgSrc = URL.createObjectURL(_file);
 
-                        let _img = {};
-                        _img.imgSrc = imgSrc;
-                        _img.name = _file.name;
-                        _img.frameDuration = [];
+                        let _img = new ImageModel(imgSrc, _file.name);
 
                         if (_file.name.toLowerCase().endsWith('webp')) {
 
@@ -1020,10 +1013,7 @@
                         let imgSrc = URL.createObjectURL(_file);
 
 
-                        let _img = {};
-                        _img.imgSrc = imgSrc;
-                        _img.name = name;
-                        _img.frameDuration = [];
+                        let _img = new ImageModel(imgSrc, name);
 
                         imgFiles.push(_img);
                     }
@@ -1094,10 +1084,7 @@
 
                     // console.log(imgSrc);
 
-                    var _img = {};
-                    _img.imgSrc = imgSrc;
-                    _img.name = _filename;
-                    _img.frameDuration = [];
+                    var _img = new ImageModel(imgSrc, _filename);
 
                     if (_filename.toLowerCase().endsWith('webp')) {
 
@@ -1193,10 +1180,7 @@
                 // Create img  
                 var imgSrc = `data:${mime};base64,${base64}`;
 
-                var _img = {};
-                _img.imgSrc = imgSrc;
-                _img.name = fileName;
-                _img.frameDuration = [];
+                var _img = new ImageModel(imgSrc, fileName);
 
                 // 預先載入
                 appendImg(_img, area)
@@ -1826,6 +1810,16 @@
                 }
             });
         };
+
+
+        class ImageModel {
+
+            constructor(imgSrc, name, frameDuration = []) {
+                this.imgSrc = imgSrc;
+                this.name = name;
+                this.frameDuration = frameDuration;
+            }
+        }
 
     </script>
 </body>
