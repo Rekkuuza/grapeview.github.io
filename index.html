@@ -41,13 +41,23 @@
     body.modal-open .modal-backdrop {
         opacity: 0;
     }
+
+    #mixBlendDropdownMenu a {
+        padding: 0;
+        margin: 0;
+    }
+
+    #mixBlendDropdownMenu p {
+        padding: 0;
+        margin: 0;
+        background-color: white;
+    }
 </style>
 
 <body class="bg-dark">
 
     <!-- 互動視窗 調整圖片設定(大小對比) Modal -->
-    <div class="modal" id="settingModal" tabindex="-1" aria-labelledby="settingModalLabel" aria-hidden="true"
-        data-bs-backdrop="static">
+    <div class="modal" id="settingModal" tabindex="-1" aria-labelledby="settingModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
@@ -96,30 +106,69 @@
                         <label class="form-label" data-bs-toggle="tooltip" title="混合圖層">MIX-BLEND-MODE</label>
                         <div class="row">
                             <input type="color" class="form-control form-control-color col" id="mixBlendColorPicker"
-                                value="#000000" title="Choose your color">
-                            <select id="mixBlendSelector" class="col">
-                                <option value="normal">normal</option>
-                                <option value="multiply">multiply</option>
-                                <option value="screen">screen</option>
-                                <option value="overlay">overlay</option>
-                                <option value="darken">darken</option>
-                                <option value="lighten">lighten</option>
-                                <option value="color-dodge">color-dodge</option>
-                                <option value="color-burn">color-burn</option>
-                                <option value="hard-light">hard-light</option>
-                                <option value="soft-light">soft-light</option>
-                                <option value="difference">difference</option>
-                                <option value="exclusion">exclusion</option>
-                                <option value="hue">hue</option>
-                                <option value="saturation">saturation</option>
-                                <option value="color">color</option>
-                                <option value="luminosity">luminosity</option>
-                                <option value="plus-darker">plus-darker</option>
-                                <option value="plus-lighter">plus-lighter</option>
-                            </select>
+                                value="#ffffff" title="Choose your color">
+
+                            <div class="btn-group dropup col">
+                                <button type="button" class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    MIX COLOR
+                                </button>
+                                <ul id="mixBlendDropdownMenu" class="dropdown-menu">
+                                    <li><a class="dropdown-item" data-mixBlend="normal">
+                                            <p style="mix-blend-mode:normal">normal</p>
+                                        </a></li>
+                                    <li><a class="dropdown-item" data-mixBlend="screen">
+                                            <p style="mix-blend-mode:screen">screen</p>
+                                        </a></li>
+                                    <li><a class="dropdown-item" data-mixBlend="overlay">
+                                            <p style="mix-blend-mode:overlay">overlay</p>
+                                        </a></li>
+                                    <li><a class="dropdown-item" data-mixBlend="darken">
+                                            <p style="mix-blend-mode:darken">darken</p>
+                                        </a></li>
+                                    <li><a class="dropdown-item" data-mixBlend="lighten">
+                                            <p style="mix-blend-mode:lighten">lighten</p>
+                                        </a></li>
+                                    <li><a class="dropdown-item" data-mixBlend="color-dodge">
+                                            <p style="mix-blend-mode:color-dodge">color-dodge</p>
+                                        </a> </li>
+                                    <li><a class="dropdown-item" data-mixBlend="color-burn">
+                                            <p style="mix-blend-mode:color-burn">color-burn</p>
+                                        </a></li>
+                                    <li><a class="dropdown-item" data-mixBlend="hard-light">
+                                            <p style="mix-blend-mode:hard-light">hard-light</p>
+                                        </a></li>
+                                    <li><a class="dropdown-item" data-mixBlend="soft-light">
+                                            <p style="mix-blend-mode:soft-light">soft-light</p>
+                                        </a></li>
+                                    <li><a class="dropdown-item" data-mixBlend="difference">
+                                            <p style="mix-blend-mode:difference">difference</p>
+                                        </a></li>
+                                    <li><a class="dropdown-item" data-mixBlend="exclusion">
+                                            <p style="mix-blend-mode:exclusion">exclusion</p>
+                                        </a></li>
+                                    <li><a class="dropdown-item" data-mixBlend="hue">
+                                            <p style="mix-blend-mode:hue">hue</p>
+                                        </a> </li>
+                                    <li><a class="dropdown-item" data-mixBlend="saturation">
+                                            <p style="mix-blend-mode:saturation">saturation</p>
+                                        </a></li>
+                                    <li><a class="dropdown-item" data-mixBlend="color">
+                                            <p style="mix-blend-mode:color">color</p>
+                                        </a></li>
+                                    <li><a class="dropdown-item" data-mixBlend="luminosity">
+                                            <p style="mix-blend-mode:luminosity">luminosity</p>
+                                        </a></li>
+                                    <li><a class="dropdown-item" data-mixBlend="plus-darker">
+                                            <p style="mix-blend-mode:plus-darker">plus-darker</p>
+                                        </a> </li>
+                                    <li><a class="dropdown-item" data-mixBlend="plus-lighter">
+                                            <p style="mix-blend-mode:plus-lighter">plus-lighter</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-
-
                     </div>
 
 
@@ -481,6 +530,18 @@
         let pageModeNow = 0; // 頁面現在模式
         let timeOutList = []; // 用於存儲 setTimeout 的 ID
         let bookmarkList = []; // 書籤清單
+
+        $(document).ready(function () {
+
+            // 處理 Bootstrap 下拉選單在固定定位元素中的顯示問題
+            const dropdowns = document.querySelectorAll('.dropdown-toggle')
+            const dropdown = [...dropdowns].map((dropdownToggleEl) => new bootstrap.Dropdown(dropdownToggleEl, {
+                popperConfig(defaultBsPopperConfig) {
+                    return { ...defaultBsPopperConfig, strategy: 'fixed' };
+                }
+            }));
+
+        });
 
         /**
          * 頁面模式切換 
@@ -1759,14 +1820,20 @@
             var newValue = this.value;
 
             $('figure').css('background-color', newValue);
+
+            $('#mixBlendDropdownMenu a').css('background-color', newValue);
         });
 
-        $('#mixBlendSelector').change(function () {
+
+        // 混合圖層模式選擇
+        $('#mixBlendDropdownMenu a').click(function () {
 
             $('figure').css('background-color', $('#mixBlendColorPicker').val());
 
-            $('img').css('mix-blend-mode', this.value);
+            $('img').css('mix-blend-mode', this.getAttribute('data-mixBlend'));
+
         });
+
 
         // 顯示/隱藏圖片名稱
         function showImageName() {
