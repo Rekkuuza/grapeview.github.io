@@ -66,10 +66,10 @@
                 </div>
                 <div class="modal-body">
                     <div>
-                        <label for="imageSizeRange" class="form-label">IMAGE SIZE </label>
-                        <label id="imageSizeRangeValue" class="form-label">0</label>
-                        <button id="btn_resetImageSize" class="btn btn-light">⮌</button>
-                        <input type="range" class="form-range" min="-1000" max="1000" id="imageSizeRange" value="0">
+                        <label for="imageWidthSizeRange" class="form-label">IMAGE WIDTH </label>
+                        <label id="imageWidthSizeRangeValue" class="form-label"> AUTO</label>
+                        <button id="btn_resetImageWidthSize" class="btn btn-light">⮌</button>
+                        <input type="range" class="form-range" min="0" max="4" id="imageWidthSizeRange" value="4">
                     </div>
                     <div>
                         <label for="contrastRange" class="form-label" data-bs-toggle="tooltip" title="對比">CONTRAST
@@ -530,6 +530,8 @@
         let pageModeNow = 0; // 頁面現在模式
         let timeOutList = []; // 用於存儲 setTimeout 的 ID
         let bookmarkList = []; // 書籤清單
+        let imgSizeWidthNow = 'w-auto';
+
 
         $(document).ready(function () {
 
@@ -1298,7 +1300,7 @@
             timeOutList.forEach((id) => clearTimeout(id));
 
             // 還原圖片調整
-            defaultImageSize();
+            changeImageWidthSize(['w-auto', 'AUTO'], 4);
 
         }
 
@@ -1380,17 +1382,25 @@
                 page_select = '#page_select2';
             }
 
+            const p = document.createElement('p');
+            let _pid = 'area_' + area + '_' + name;
+            p.innerHTML = name;
+            p.setAttribute("id", _pid);
+            p.className = 'image_name';
+
 
             const img = document.createElement('img');
             img.src = imgSrc;
-            img.style.cssText = 'height:auto;';
-            img.className = 'a1-image mb-0';
+            img.className = 'figure-img img-fluid a1-image m-0 col';
+            img.className += ' ' + imgSizeWidthNow;
+
             let _imgid = 'area_' + area + '_img_' + name;
             img.setAttribute("id", _imgid);
 
             const figure = document.createElement('figure');
-            figure.style.cssText = 'height:auto;';
-            figure.className = 'p-0 m-0';
+            figure.className = 'figure p-0 m-0';
+            figure.className += ' ' + imgSizeWidthNow;
+            figure.append(p);
             figure.append(img);
 
 
@@ -1404,13 +1414,9 @@
             // canvas.className = 'a1-canvas';
             // canvas.style.cssText = 'display:none';
 
-            const p = document.createElement('p');
-            let _pid = 'area_' + area + '_' + name;
-            p.innerHTML = name;
-            p.setAttribute("id", _pid);
-            p.className = 'image_name';
 
-            $(div_imgs).append(p);
+
+            // $(div_imgs).append(p);
             $(div_imgs).append(figure);
             //  $(div_imgs).append(canvas);
 
@@ -1430,7 +1436,7 @@
                 progressRun(imgFile.frameDuration, 0, _progressId);
             }
 
-            $(div_imgs).append('<br>');
+            // $(div_imgs).append('<br>');
 
             const option = document.createElement('option');
             option.value = _pid;
@@ -1693,46 +1699,49 @@
         let lastSize = 0;
 
         // 圖片大小調整
-        $('#imageSizeRange').change(function () {
+        // 寬度調整
+        $('#imageWidthSizeRange').change(function () {
 
-            var newSize = this.value;
-            var sizeChange = newSize - lastSize;
+            var newSize = ['w-auto', 'AUTO'];
+            switch (this.value) {
+                case '0':
+                    newSize = ['w-25', '25%'];
+                    break;
+                case '1':
+                    newSize = ['w-50', '50%'];
+                    break;
+                case '2':
+                    newSize = ['w-75', '75%'];
+                    break;
+                case '3':
+                    newSize = ['w-100', '100%'];
+                    break;
+                case '4':
+                    newSize = ['w-auto', 'AUTO'];
+                    break;
+                default:
+                    newSize = ['w-auto', 'AUTO'];
+            }
 
-
-            $('img').each(function () {
-
-                var _widthNow = $(this).width();
-
-                var _newWidth = _widthNow + sizeChange;
-
-                $(this).css('width', _newWidth + 'px');
-            });
-
-            lastSize = newSize;
-            $('#imageSizeRangeValue').html('+' + newSize + 'px');
-
+            changeImageWidthSize(newSize, this.value);
         });
 
-        $('#btn_resetImageSize').click(function () {
-            defaultImageSize();
+        $('#btn_resetImageWidthSize').click(function () {
+            changeImageWidthSize(['w-auto', 'AUTO'], 4);
         });
 
-        function defaultImageSize() {
+        function changeImageWidthSize(size, scale) {
 
 
-            var sizeChange = 0 - lastSize;
-            $('img').each(function () {
-
-                var _widthNow = $(this).width();
-
-                var _newWidth = _widthNow + sizeChange;
-
-                $(this).css('width', _newWidth + 'px');
+            $('figure').each(function () {
+                $(this).removeClass(imgSizeWidthNow).addClass(size[0]);
+                $(this).find('img').removeClass(imgSizeWidthNow).addClass(size[0]);
             });
 
-            lastSize = 0;
-            $('#imageSizeRange').val(0);
-            $('#imageSizeRangeValue').html('0');
+            $('#imageWidthSizeRange').val(scale);
+            $('#imageWidthSizeRangeValue').html(' ' + size[1]);
+
+            imgSizeWidthNow = size[0];
         }
 
 
