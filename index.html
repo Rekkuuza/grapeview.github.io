@@ -59,129 +59,140 @@
     <!-- 互動視窗 調整圖片設定(大小對比) Modal -->
     <div class="modal" id="settingModal" tabindex="-1" aria-labelledby="settingModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
+            <div class="modal-content p-3">
                 <div class="modal-header">
                     <h5 class="modal-title" id="settingModalLabel">⚙ IMAGE SETTING</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div>
-                        <label for="imageWidthSizeRange" class="form-label">IMAGE WIDTH </label>
-                        <label id="imageWidthSizeRangeValue" class="form-label"> AUTO</label>
-                        <button id="btn_resetImageWidthSize" class="btn btn-light">⮌</button>
-                        <input type="range" class="form-range" min="0" max="4" id="imageWidthSizeRange" value="4">
-                    </div>
-                    <div>
-                        <label for="contrastRange" class="form-label" data-bs-toggle="tooltip" title="對比">CONTRAST
-                        </label>
-                        <label id="contrastRangeValue" class="form-label">100%</label>
-                        <button id="btn_resetContrast" class="btn btn-light">⮌</button>
-                        <input type="range" class="form-range" min="0" max="400" id="contrastRange" value="100">
-                    </div>
-                    <div>
-                        <label for="brightnessRange" class="form-label" data-bs-toggle="tooltip" title="亮度">BRIGHTNESS
-                        </label>
-                        <label id="brightnessRangeValue" class="form-label">100%</label>
-                        <button id="btn_resetBrightness" class="btn btn-light">⮌</button>
-                        <input type="range" class="form-range" min="0" max="400" id="brightnessRange" value="100">
+                    <div class="form-check form-switch ms-2">
+                        <label class="form-check-label" for="wideSwitch">Wide Mode</label>
+                        <input class="form-check-input" type="checkbox" id="wideSwitch" onchange="wideSwitch(this)">
 
                     </div>
-                    <div>
-                        <label for="saturationRange" class="form-label" data-bs-toggle="tooltip" title="飽和度">SATURATION
-                        </label>
-                        <label id="saturationRangeValue" class="form-label">100%</label>
-                        <button id="btn_resetSaturation" class="btn btn-light">⮌</button>
-                        <input type="range" class="form-range" min="0" max="200" id="saturationRange" value="100">
+
+                    <div class="form-check form-switch ms-2">
+                        <label class="form-check-label" for="OnePicSwitch">One Pic Mode</label>
+                        <input class="form-check-input" type="checkbox" id="OnePicSwitch" onchange="setPageMode(1)">
+
 
                     </div>
-                    <div>
-                        <label for="grayscaleRange" class="form-label" data-bs-toggle="tooltip" title="灰度">GRAYSCALE
-                        </label>
-                        <label id="grayscaleRangeValue" class="form-label">0%</label>
-                        <button id="btn_resetGrayscale" class="btn btn-light">⮌</button>
-                        <input type="range" class="form-range" min="0" max="100" id="grayscaleRange" value="0">
-
+                    <div class="form-check form-switch ms-2">
+                        <label class="form-label" for="showImageSwitch">Show Image Name</label>
+                        <input class="form-check-input" type="checkbox" id="showImageSwitch" onchange="showImageName()">
                     </div>
-                    <div>
-                        <label class="form-label" data-bs-toggle="tooltip" title="混合圖層">MIX-BLEND-MODE</label>
-                        <div class="row">
-                            <input type="color" class="form-control form-control-color col" id="mixBlendColorPicker"
-                                value="#ffffff" title="Choose your color">
+                </div>
+                <div>
+                    <label for="imageWidthSizeRange" class="form-label">IMAGE WIDTH </label>
+                    <label id="imageWidthSizeRangeValue" class="form-label"> AUTO</label>
+                    <button id="btn_resetImageWidthSize" class="btn btn-light">⮌</button>
+                    <input type="range" class="form-range" min="0" max="4" id="imageWidthSizeRange" value="4">
+                </div>
+                <div>
+                    <label for="contrastRange" class="form-label" data-bs-toggle="tooltip" title="對比">CONTRAST
+                    </label>
+                    <label id="contrastRangeValue" class="form-label">100%</label>
+                    <button id="btn_resetContrast" class="btn btn-light">⮌</button>
+                    <input type="range" class="form-range" min="0" max="400" id="contrastRange" value="100">
+                </div>
+                <div>
+                    <label for="brightnessRange" class="form-label" data-bs-toggle="tooltip" title="亮度">BRIGHTNESS
+                    </label>
+                    <label id="brightnessRangeValue" class="form-label">100%</label>
+                    <button id="btn_resetBrightness" class="btn btn-light">⮌</button>
+                    <input type="range" class="form-range" min="0" max="400" id="brightnessRange" value="100">
 
-                            <div class="btn-group dropup col">
-                                <button type="button" class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
-                                    MIX COLOR
-                                </button>
-                                <ul id="mixBlendDropdownMenu" class="dropdown-menu">
-                                    <li><a class="dropdown-item" data-mixBlend="normal">
-                                            <p style="mix-blend-mode:normal">normal</p>
-                                        </a></li>
-                                    <li><a class="dropdown-item" data-mixBlend="screen">
-                                            <p style="mix-blend-mode:screen">screen</p>
-                                        </a></li>
-                                    <li><a class="dropdown-item" data-mixBlend="overlay">
-                                            <p style="mix-blend-mode:overlay">overlay</p>
-                                        </a></li>
-                                    <li><a class="dropdown-item" data-mixBlend="darken">
-                                            <p style="mix-blend-mode:darken">darken</p>
-                                        </a></li>
-                                    <li><a class="dropdown-item" data-mixBlend="lighten">
-                                            <p style="mix-blend-mode:lighten">lighten</p>
-                                        </a></li>
-                                    <li><a class="dropdown-item" data-mixBlend="color-dodge">
-                                            <p style="mix-blend-mode:color-dodge">color-dodge</p>
-                                        </a> </li>
-                                    <li><a class="dropdown-item" data-mixBlend="color-burn">
-                                            <p style="mix-blend-mode:color-burn">color-burn</p>
-                                        </a></li>
-                                    <li><a class="dropdown-item" data-mixBlend="hard-light">
-                                            <p style="mix-blend-mode:hard-light">hard-light</p>
-                                        </a></li>
-                                    <li><a class="dropdown-item" data-mixBlend="soft-light">
-                                            <p style="mix-blend-mode:soft-light">soft-light</p>
-                                        </a></li>
-                                    <li><a class="dropdown-item" data-mixBlend="difference">
-                                            <p style="mix-blend-mode:difference">difference</p>
-                                        </a></li>
-                                    <li><a class="dropdown-item" data-mixBlend="exclusion">
-                                            <p style="mix-blend-mode:exclusion">exclusion</p>
-                                        </a></li>
-                                    <li><a class="dropdown-item" data-mixBlend="hue">
-                                            <p style="mix-blend-mode:hue">hue</p>
-                                        </a> </li>
-                                    <li><a class="dropdown-item" data-mixBlend="saturation">
-                                            <p style="mix-blend-mode:saturation">saturation</p>
-                                        </a></li>
-                                    <li><a class="dropdown-item" data-mixBlend="color">
-                                            <p style="mix-blend-mode:color">color</p>
-                                        </a></li>
-                                    <li><a class="dropdown-item" data-mixBlend="luminosity">
-                                            <p style="mix-blend-mode:luminosity">luminosity</p>
-                                        </a></li>
-                                    <li><a class="dropdown-item" data-mixBlend="plus-darker">
-                                            <p style="mix-blend-mode:plus-darker">plus-darker</p>
-                                        </a> </li>
-                                    <li><a class="dropdown-item" data-mixBlend="plus-lighter">
-                                            <p style="mix-blend-mode:plus-lighter">plus-lighter</p>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
+                </div>
+                <div>
+                    <label for="saturationRange" class="form-label" data-bs-toggle="tooltip" title="飽和度">SATURATION
+                    </label>
+                    <label id="saturationRangeValue" class="form-label">100%</label>
+                    <button id="btn_resetSaturation" class="btn btn-light">⮌</button>
+                    <input type="range" class="form-range" min="0" max="200" id="saturationRange" value="100">
 
+                </div>
+                <div>
+                    <label for="grayscaleRange" class="form-label" data-bs-toggle="tooltip" title="灰度">GRAYSCALE
+                    </label>
+                    <label id="grayscaleRangeValue" class="form-label">0%</label>
+                    <button id="btn_resetGrayscale" class="btn btn-light">⮌</button>
+                    <input type="range" class="form-range" min="0" max="100" id="grayscaleRange" value="0">
 
-                    <div>
-                        <label for="brightnessRange" class="form-label">SHOW IMAGE NAME</label>
-                        <div class="form-check form-switch ms-2">
-                            <input class="form-check-input" type="checkbox" id="showImageSwitch"
-                                onchange="showImageName()">
+                </div>
+                <div>
+                    <label class="form-label" data-bs-toggle="tooltip" title="混合圖層">MIX-BLEND-MODE</label>
+                    <div class="row">
+                        <input type="color" class="form-control form-control-color col" id="mixBlendColorPicker"
+                            value="#ffffff" title="Choose your color">
+
+                        <div class="btn-group dropup col">
+                            <button type="button" class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                                MIX COLOR
+                            </button>
+                            <ul id="mixBlendDropdownMenu" class="dropdown-menu">
+                                <li><a class="dropdown-item" data-mixBlend="normal">
+                                        <p style="mix-blend-mode:normal">normal</p>
+                                    </a></li>
+                                <li><a class="dropdown-item" data-mixBlend="screen">
+                                        <p style="mix-blend-mode:screen">screen</p>
+                                    </a></li>
+                                <li><a class="dropdown-item" data-mixBlend="overlay">
+                                        <p style="mix-blend-mode:overlay">overlay</p>
+                                    </a></li>
+                                <li><a class="dropdown-item" data-mixBlend="darken">
+                                        <p style="mix-blend-mode:darken">darken</p>
+                                    </a></li>
+                                <li><a class="dropdown-item" data-mixBlend="lighten">
+                                        <p style="mix-blend-mode:lighten">lighten</p>
+                                    </a></li>
+                                <li><a class="dropdown-item" data-mixBlend="color-dodge">
+                                        <p style="mix-blend-mode:color-dodge">color-dodge</p>
+                                    </a> </li>
+                                <li><a class="dropdown-item" data-mixBlend="color-burn">
+                                        <p style="mix-blend-mode:color-burn">color-burn</p>
+                                    </a></li>
+                                <li><a class="dropdown-item" data-mixBlend="hard-light">
+                                        <p style="mix-blend-mode:hard-light">hard-light</p>
+                                    </a></li>
+                                <li><a class="dropdown-item" data-mixBlend="soft-light">
+                                        <p style="mix-blend-mode:soft-light">soft-light</p>
+                                    </a></li>
+                                <li><a class="dropdown-item" data-mixBlend="difference">
+                                        <p style="mix-blend-mode:difference">difference</p>
+                                    </a></li>
+                                <li><a class="dropdown-item" data-mixBlend="exclusion">
+                                        <p style="mix-blend-mode:exclusion">exclusion</p>
+                                    </a></li>
+                                <li><a class="dropdown-item" data-mixBlend="hue">
+                                        <p style="mix-blend-mode:hue">hue</p>
+                                    </a> </li>
+                                <li><a class="dropdown-item" data-mixBlend="saturation">
+                                        <p style="mix-blend-mode:saturation">saturation</p>
+                                    </a></li>
+                                <li><a class="dropdown-item" data-mixBlend="color">
+                                        <p style="mix-blend-mode:color">color</p>
+                                    </a></li>
+                                <li><a class="dropdown-item" data-mixBlend="luminosity">
+                                        <p style="mix-blend-mode:luminosity">luminosity</p>
+                                    </a></li>
+                                <li><a class="dropdown-item" data-mixBlend="plus-darker">
+                                        <p style="mix-blend-mode:plus-darker">plus-darker</p>
+                                    </a> </li>
+                                <li><a class="dropdown-item" data-mixBlend="plus-lighter">
+                                        <p style="mix-blend-mode:plus-lighter">plus-lighter</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
+
+
+
             </div>
         </div>
+    </div>
     </div>
 
     <!-- 互動視窗 書籤 Modal -->
@@ -212,32 +223,6 @@
 
     <div id="container_div" class="container-xxl">
         <br />
-        <div class="row">
-            <div class="col">
-                <h1 id="title" class="text-light col">🍇 Grape View</h1>
-            </div>
-
-            <div class="col">
-                <div class="form-check form-switch ms-2">
-                    <input class="form-check-input h5" type="checkbox" id="wideSwitch" onchange="wideSwitch(this)">
-                    <label class="form-check-label text-light h5" for="wideSwitch">Wide Mode</label>
-                </div>
-
-                <div class="form-check form-switch ms-2">
-                    <input class="form-check-input h5" type="checkbox" id="OnePicSwitch" onchange="setPageMode(1)">
-                    <label class="form-check-label text-light h5" for="OnePicSwitch">One Pic Mode</label>
-
-                </div>
-
-                <!-- <div class="form-check form-switch ms-2">
-                    <input class="form-check-input h5" type="checkbox" id="editSwitch" onchange="setPageMode(3)">
-                    <label class="form-check-label text-light h5" for="editSwitch">Edit Mode</label>
-
-                </div> -->
-            </div>
-        </div>
-
-        <br />
         <br />
 
         <div class="row">
@@ -249,7 +234,7 @@
                     <div class="col-8">
                         <fieldset id="drop_area" class="border border-4 border-light p-2 position-relative">
 
-                            <legend class="text-light float-none w-auto p-2">Drop Files</legend>
+                            <legend class="text-light float-none w-auto p-2">🍇 Grape View Drop Files</legend>
 
 
                             <!-- 下拉選單1 -->
