@@ -361,8 +361,8 @@
                         <div id="bottom_tool_function" class="row m-0 bg-primary rounded-2" style="width: fit-content;">
 
                             <!-- 回到頁面頂端 -->
-                            <button class="col btn btn-primary btn-lg m-2 " onclick="topFunction()">
-                                <span class="bi bi-airplane-fill"></span>
+                            <button class="col btn btn-primary btn-lg m-2" id="btn_top" onclick="topFunction()">
+                                <div class="bi bi-airplane-fill" id="airplane_icon"></div>
                             </button>
 
                             <!-- 開啟設定選單 -->
@@ -1593,15 +1593,41 @@
             });
         }
 
+
+        let flyToTopA1 = true;
+
         // 回到頁面頂端
         function topFunction() {
 
-            document.getElementById('title').scrollIntoView({
-                behavior: "instant",  // smooth, instant, auto
-                block: "start",      // 將元素的哪個部分對齊到可視區域（start, center, end, nearest）
-            });
+            if (flyToTopA1) {
+                document.getElementById('title').scrollIntoView({
+                    behavior: "instant",  // smooth, instant, auto
+                    block: "start",      // 將元素的哪個部分對齊到可視區域（start, center, end, nearest）
+                });
+            } else {
 
+                if (tempImgFilesArea1.length == 0) return;
+
+                selectControlsPage(tempImgFilesArea1.slice(-1)[0].name);
+            }
         }
+
+        $('#btn_top').on('wheel', function (e) {
+
+            e.preventDefault();
+
+            if (event.deltaY < 0) {
+                // 滾輪向上滾動
+                flyToTopA1 = true;
+                $('#airplane_icon').css({ 'transform': 'rotate(0deg)' });
+
+            } else {
+                // 滾輪向下滾動
+                flyToTopA1 = false;
+                $('#airplane_icon').css({ 'transform': 'rotate(180deg)' });
+            }
+
+        });
 
 
         // 選取頁碼
