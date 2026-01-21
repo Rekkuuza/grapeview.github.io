@@ -353,42 +353,44 @@
 
 
                 <!-- 畫面中下方工具 -->
-                <div id="bottom_tool_area" class="position-fixed bottom-0 end-0 m-5">
+                <div id="bottom_tool_area" class="position-fixed bottom-0 end-0 m-2">
 
-                    <p>&nbsp&nbsp&nbsp&nbsp&nbsp</p>
-                    <div id="bottom_tool_function" class="row m-0 bg-primary rounded-2" style="width: fit-content;">
+                    <div>
+                        <h4 id="bottom_tool_gear" class="bi bi-gear-fill text-white opacity-50" style="display:none">
+                        </h4>
+                        <div id="bottom_tool_function" class="row m-0 bg-primary rounded-2" style="width: fit-content;">
 
-                        <!-- 回到頁面頂端 -->
-                        <button class="col btn btn-primary btn-lg m-2 " onclick="topFunction()">
-                            <span class="bi bi-airplane-fill"></span>
-                        </button>
+                            <!-- 回到頁面頂端 -->
+                            <button class="col btn btn-primary btn-lg m-2 " onclick="topFunction()">
+                                <span class="bi bi-airplane-fill"></span>
+                            </button>
 
-                        <!-- 開啟設定選單 -->
-                        <button class="col btn btn-primary btn-lg m-1" data-bs-toggle="modal"
-                            data-bs-target="#settingModal">
-                            <i class="bi bi-gear-fill"></i>
-                        </button>
+                            <!-- 開啟設定選單 -->
+                            <button class="col btn btn-primary btn-lg m-1" data-bs-toggle="modal"
+                                data-bs-target="#settingModal">
+                                <i class="bi bi-gear-fill"></i>
+                            </button>
 
-                        <!-- 開啟書籤選單 -->
-                        <button class="col btn btn-primary btn-lg m-1" data-bs-toggle="modal"
-                            data-bs-target="#bookmarkModal">
-                            <i class="bi bi-journal-bookmark-fill"></i>
-                        </button>
+                            <!-- 開啟書籤選單 -->
+                            <button class="col btn btn-primary btn-lg m-1" data-bs-toggle="modal"
+                                data-bs-target="#bookmarkModal">
+                                <i class="bi bi-journal-bookmark-fill"></i>
+                            </button>
 
 
-                        <!-- 選擇頁面下拉選單 -->
-                        <div class="col-md-auto p-2">
-                            <select id="midPageSelect" class="form-select form-select-lg" aria-label="select page"
-                                onchange="selectControlsPage(this.value)">
-                            </select>
+                            <!-- 選擇頁面下拉選單 -->
+                            <div class="col-md-auto p-2">
+                                <select id="midPageSelect" class="form-select form-select-lg" aria-label="select page"
+                                    onchange="selectControlsPage(this.value)">
+                                </select>
+                            </div>
+
+                            <!-- 隱藏工具列 -->
+                            <button class="col btn btn-primary btn-lg m-1" id="btn_hide_tool">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
                         </div>
-
-                        <!-- 隱藏工具列 -->
-                        <button class="col btn btn-primary btn-lg m-1" id="btn_hide_tool">
-                            <i class="bi bi-x-lg"></i>
-                        </button>
                     </div>
-
                 </div>
             </div> <!-- div_trunk -->
 
@@ -1655,6 +1657,7 @@
         $('#btn_hide_tool').on('click', function () {
 
             $('#bottom_tool_function').toggle();
+            $('#bottom_tool_gear').toggle();
 
             toolIsClosing = true;
 
@@ -1677,6 +1680,8 @@
 
             if (!display) {
                 $('#bottom_tool_function').toggle();
+                $('#bottom_tool_gear').toggle();
+                toolIsClosing = false;
             }
 
         });
