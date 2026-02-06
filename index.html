@@ -1753,6 +1753,7 @@
             $('figure').each(function () {
                 $(this).removeClass(imgSizeWidthNow).addClass(size[0]);
                 $(this).find('img').removeClass(imgSizeWidthNow).addClass(size[0]);
+                $(this).find('progress').removeClass(imgSizeWidthNow).addClass(size[0]);
             });
 
             $('#imageWidthSizeRange').val(scale);
